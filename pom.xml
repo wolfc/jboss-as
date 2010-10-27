@@ -112,6 +112,7 @@
         <module>logging</module>
         <module>transactions</module>
         <module>naming</module>
+        <module>naming-int</module>
         <module>jmx</module>
         <module>sar</module>
         <module>managedbeans</module>

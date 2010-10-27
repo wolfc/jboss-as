@@ -33,13 +33,12 @@
     </parent>
 
     <groupId>org.jboss.as</groupId>
-    <artifactId>jboss-as-naming</artifactId>
+    <artifactId>jboss-as-naming-int</artifactId>
     <version>7.0.0.Beta1-SNAPSHOT</version>
 
     <name>JBoss Application Server: Naming Subsystem</name>
 
     <dependencies>
-        <!--
         <dependency>
             <groupId>org.jboss.msc</groupId>
             <artifactId>jboss-msc</artifactId>
@@ -48,7 +47,10 @@
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-domain</artifactId>
         </dependency>
-        -->
+        <dependency>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-naming</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
