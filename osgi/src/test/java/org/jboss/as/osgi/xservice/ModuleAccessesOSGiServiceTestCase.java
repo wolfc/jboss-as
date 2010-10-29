@@ -45,7 +45,7 @@ import org.jboss.as.osgi.deployment.b.EchoInvoker;
 import org.jboss.as.osgi.deployment.b.EchoInvokerService;
 import org.jboss.as.osgi.deployment.b.TargetBundleActivator;
 import org.jboss.as.osgi.deployment.c.Echo;
-import org.jboss.as.osgi.service.FrameworkService;
+import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.modules.DependencySpec;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleSpec;
@@ -204,7 +204,7 @@ public class ModuleAccessesOSGiServiceTestCase extends AbstractOSGiSubsystemTest
             public void execute(BatchBuilder batchBuilder) throws Exception {
                 Object service = loadClass(moduleId, EchoInvokerService.class.getName()).newInstance();
                 BatchServiceBuilder<?> serviceBuilder = batchBuilder.addService(EchoInvokerService.SERVICE_NAME, (Service<?>) service);
-                serviceBuilder.addDependency(FrameworkService.SERVICE_NAME);
+                serviceBuilder.addDependency(BundleContextService.SERVICE_NAME);
                 serviceBuilder.setInitialMode(Mode.ACTIVE);
             }
         };

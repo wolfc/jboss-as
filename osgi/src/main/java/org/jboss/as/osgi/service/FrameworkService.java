@@ -28,7 +28,6 @@ import java.util.List;
 import javax.management.MBeanServer;
 
 import org.jboss.as.jmx.MBeanServerService;
-import org.jboss.as.osgi.parser.OSGiSubsystemState.Activation;
 import org.jboss.as.osgi.parser.OSGiSubsystemState.OSGiModule;
 import org.jboss.logging.Logger;
 import org.jboss.modules.ModuleIdentifier;
@@ -49,7 +48,6 @@ import org.jboss.osgi.deployment.deployer.Deployment;
 import org.jboss.osgi.framework.bundle.AbstractUserBundle;
 import org.jboss.osgi.framework.bundle.BundleManager;
 import org.jboss.osgi.framework.plugin.BundleDeploymentPlugin;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
@@ -63,7 +61,7 @@ import org.osgi.framework.launch.Framework;
  * @author Thomas.Diesler@jboss.com
  * @since 11-Sep-2010
  */
-public class FrameworkService implements Service<BundleContext> {
+public class FrameworkService implements Service<Framework> {
     public static final ServiceName SERVICE_NAME = ServiceName.JBOSS.append("osgi", "framework");
     private static final Logger log = Logger.getLogger("org.jboss.as.osgi");
 
@@ -72,19 +70,19 @@ public class FrameworkService implements Service<BundleContext> {
     private InjectedValue<Configuration> injectedConfig = new InjectedValue<Configuration>();
     private Framework framework;
 
-    public static void addService(final BatchBuilder batchBuilder, Activation policy) {
+    public static void addService(final BatchBuilder batchBuilder) {
         FrameworkService service = new FrameworkService();
         BatchServiceBuilder<?> serviceBuilder = batchBuilder.addService(FrameworkService.SERVICE_NAME, service);
         serviceBuilder.addDependency(BundleManagerService.SERVICE_NAME, BundleManager.class, service.injectedBundleManager);
         serviceBuilder.addDependency(MBeanServerService.SERVICE_NAME, MBeanServer.class, service.injectedMBeanServer);
         serviceBuilder.addDependency(Configuration.SERVICE_NAME, Configuration.class, service.injectedConfig);
-        serviceBuilder.setInitialMode(policy == Activation.LAZY ? Mode.ON_DEMAND : Mode.ACTIVE);
+        serviceBuilder.setInitialMode(Mode.ON_DEMAND);
     }
 
-    public static BundleContext getServiceValue(ServiceContainer container) {
+    public static Framework getServiceValue(ServiceContainer container) {
         try {
             ServiceController<?> controller = container.getRequiredService(SERVICE_NAME);
-            return (BundleContext) controller.getValue();
+            return (Framework) controller.getValue();
         } catch (ServiceNotFoundException ex) {
             throw new IllegalStateException("Cannot obtain required service: " + SERVICE_NAME);
         }
@@ -163,9 +161,7 @@ public class FrameworkService implements Service<BundleContext> {
     }
 
     @Override
-    public BundleContext getValue() throws IllegalStateException {
-        if (framework == null || framework.getState() != Bundle.ACTIVE)
-            throw new IllegalStateException("Cannot get BundleContext for: " + framework);
-        return framework.getBundleContext();
+    public Framework getValue() throws IllegalStateException {
+        return framework;
     }
 }

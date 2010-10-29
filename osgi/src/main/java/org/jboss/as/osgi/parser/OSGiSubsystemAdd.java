@@ -27,6 +27,7 @@ import org.jboss.as.model.UpdateContext;
 import org.jboss.as.model.UpdateResultHandler;
 import org.jboss.as.osgi.deployment.OSGiDeploymentActivator;
 import org.jboss.as.osgi.parser.OSGiSubsystemState.Activation;
+import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.as.osgi.service.BundleManagerService;
 import org.jboss.as.osgi.service.Configuration;
 import org.jboss.as.osgi.service.FrameworkService;
@@ -75,7 +76,8 @@ public final class OSGiSubsystemAdd extends AbstractSubsystemAdd<OSGiSubsystemEl
         BatchBuilder batchBuilder = updateContext.getBatchBuilder();
         Configuration.addService(batchBuilder, subsystemState);
         BundleManagerService.addService(batchBuilder);
-        FrameworkService.addService(batchBuilder, policy);
+        FrameworkService.addService(batchBuilder);
+        BundleContextService.addService(batchBuilder, policy);
         PackageAdminService.addService(batchBuilder);
         new OSGiDeploymentActivator().activate(batchBuilder);
     }

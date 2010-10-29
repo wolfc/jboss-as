@@ -56,6 +56,7 @@ import org.jboss.as.model.ServerGroupDeploymentElement;
 import org.jboss.as.osgi.deployment.OSGiDeploymentService;
 import org.jboss.as.osgi.parser.OSGiSubsystemState;
 import org.jboss.as.osgi.parser.OSGiSubsystemState.Activation;
+import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.as.osgi.service.BundleManagerService;
 import org.jboss.as.osgi.service.Configuration;
 import org.jboss.as.osgi.service.FrameworkService;
@@ -217,7 +218,8 @@ public class OSGiSubsystemSupport {
     public void setupFrameworkServices(final BatchBuilder batchBuilder) {
         batchBuilder.addService(MBeanServerService.SERVICE_NAME, new MBeanServerService());
         TestBundleManagerService.addService(batchBuilder);
-        FrameworkService.addService(batchBuilder, Activation.EAGER);
+        FrameworkService.addService(batchBuilder);
+        BundleContextService.addService(batchBuilder, Activation.EAGER);
         PackageAdminService.addService(batchBuilder);
     }
 
@@ -236,7 +238,7 @@ public class OSGiSubsystemSupport {
     }
 
     public BundleContext getSystemContext() {
-        return FrameworkService.getServiceValue(serviceContainer);
+        return BundleContextService.getServiceValue(serviceContainer);
     }
 
     public Configuration getSubsystemConfig() {

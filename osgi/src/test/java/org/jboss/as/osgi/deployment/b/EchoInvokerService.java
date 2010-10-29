@@ -49,7 +49,7 @@ public class EchoInvokerService implements EchoInvoker, Service<EchoInvoker> {
 
     @Override
     public void start(StartContext context) throws StartException {
-        ServiceName serviceName = ServiceName.JBOSS.append(ServiceName.parse("osgi.framework"));
+        ServiceName serviceName = ServiceName.JBOSS.append("osgi", "context");
         try {
             ServiceContainer serviceContainer = context.getController().getServiceContainer();
             ServiceController<?> controller = serviceContainer.getRequiredService(serviceName);

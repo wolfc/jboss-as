@@ -28,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jboss.as.deployment.DeploymentService;
 import org.jboss.as.deployment.unit.DeploymentUnitContext;
-import org.jboss.as.osgi.service.FrameworkService;
+import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.as.osgi.service.PackageAdminService;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.AbstractServiceListener;
@@ -83,7 +83,7 @@ public class OSGiDeploymentService implements Service<Deployment> {
         OSGiDeploymentService service = new OSGiDeploymentService(deployment);
         ServiceName serviceName = OSGiDeploymentService.SERVICE_NAME.append(deploymentServiceName.getSimpleName());
         BatchServiceBuilder<Deployment> serviceBuilder = batchBuilder.addService(serviceName, service);
-        serviceBuilder.addDependency(FrameworkService.SERVICE_NAME, BundleContext.class, service.injectedContext);
+        serviceBuilder.addDependency(BundleContextService.SERVICE_NAME, BundleContext.class, service.injectedContext);
         serviceBuilder.addDependency(PackageAdminService.SERVICE_NAME);
         serviceBuilder.addDependency(deploymentServiceName);
         serviceBuilder.setInitialMode(Mode.ACTIVE);
@@ -103,8 +103,8 @@ public class OSGiDeploymentService implements Service<Deployment> {
         ServiceContainer serviceContainer = controller.getServiceContainer();
 
         // Make sure the Framework does not shut down when the last bundle gets removed
-        ServiceController<?> frameworkController = serviceContainer.getService(FrameworkService.SERVICE_NAME);
-        frameworkController.setMode(Mode.ACTIVE);
+        ServiceController<?> contextController = serviceContainer.getService(BundleContextService.SERVICE_NAME);
+        contextController.setMode(Mode.ACTIVE);
 
         log.tracef("Installing deployment: %s", deployment);
         try {

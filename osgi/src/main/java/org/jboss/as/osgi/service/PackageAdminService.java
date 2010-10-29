@@ -53,7 +53,7 @@ public class PackageAdminService implements Service<PackageAdmin> {
     public static void addService(final BatchBuilder batchBuilder) {
         PackageAdminService service = new PackageAdminService();
         BatchServiceBuilder<?> serviceBuilder = batchBuilder.addService(PackageAdminService.SERVICE_NAME, service);
-        serviceBuilder.addDependency(FrameworkService.SERVICE_NAME, BundleContext.class, service.injectedContext);
+        serviceBuilder.addDependency(BundleContextService.SERVICE_NAME, BundleContext.class, service.injectedContext);
         serviceBuilder.setInitialMode(Mode.ON_DEMAND);
     }
 
