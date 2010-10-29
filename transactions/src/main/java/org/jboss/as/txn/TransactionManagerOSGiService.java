@@ -24,15 +24,20 @@ package org.jboss.as.txn;
 
 import javax.transaction.TransactionManager;
 
-import org.jboss.as.util.SetContextLoaderAction;
+import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.msc.service.BatchBuilder;
 import org.jboss.msc.service.BatchServiceBuilder;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceFactory;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Service responsible for getting the {@link TransactionManager}.
@@ -40,34 +45,44 @@ import org.jboss.msc.value.InjectedValue;
  * @author Thomas.Diesler@jboss.com
  * @since 29-Oct-2010
  */
-public class TransactionManagerService implements Service<TransactionManagerService> {
-    public static final ServiceName SERVICE_NAME = TxnServices.JBOSS_TXN_TRANSACTION_MANAGER;
+public class TransactionManagerOSGiService implements Service<TransactionManagerService> {
 
-    private InjectedValue<com.arjuna.ats.jbossatx.jta.TransactionManagerService> injectedArjunaTM = new InjectedValue<com.arjuna.ats.jbossatx.jta.TransactionManagerService>();
+    public static final ServiceName SERVICE_NAME = ServiceName.JBOSS.append("osgi", "TransactionManager");
+
+    private InjectedValue<TransactionManagerService> injectedTransactionManager = new InjectedValue<TransactionManagerService>();
+    private InjectedValue<BundleContext> injectedBundleContext = new InjectedValue<BundleContext>();
 
     public static void addService(final BatchBuilder batchBuilder) {
-        TransactionManagerService service = new TransactionManagerService();
+        TransactionManagerOSGiService service = new TransactionManagerOSGiService();
         BatchServiceBuilder<?> serviceBuilder = batchBuilder.addService(SERVICE_NAME, service);
-        serviceBuilder.addDependency(ArjunaTransactionManagerService.SERVICE_NAME, com.arjuna.ats.jbossatx.jta.TransactionManagerService.class, service.injectedArjunaTM);
+        serviceBuilder.addDependency(TransactionManagerService.SERVICE_NAME, TransactionManagerService.class, service.injectedTransactionManager);
+        serviceBuilder.addDependency(BundleContextService.SERVICE_NAME, BundleContext.class, service.injectedBundleContext);
+        serviceBuilder.setInitialMode(Mode.PASSIVE);
     }
 
     public synchronized void start(StartContext context) throws StartException {
+        BundleContext systemContext = injectedBundleContext.getValue();
+        ServiceFactory serviceFactory = new TransactionManagerFactory();
+        systemContext.registerService(TransactionManager.class.getName(), serviceFactory, null);
     }
 
     public synchronized void stop(StopContext context) {
     }
 
-    public TransactionManager getTransactionManager() throws IllegalStateException {
-        ClassLoader tccl = SetContextLoaderAction.setContextLoader(getClass().getClassLoader());
-        try {
-            return injectedArjunaTM.getValue().getTransactionManager();
-        } finally {
-            SetContextLoaderAction.setContextLoader(tccl);
-        }
-    }
-
     @Override
     public TransactionManagerService getValue() throws IllegalStateException {
-        return this;
+        return injectedTransactionManager.getValue();
+    }
+
+    class TransactionManagerFactory implements ServiceFactory {
+
+        @Override
+        public Object getService(Bundle bundle, ServiceRegistration sreg) {
+            return injectedTransactionManager.getValue().getTransactionManager();
+        }
+
+        @Override
+        public void ungetService(Bundle bundle, ServiceRegistration sreg, Object service) {
+        }
     }
 }

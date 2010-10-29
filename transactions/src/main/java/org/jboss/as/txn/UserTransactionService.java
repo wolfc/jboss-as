@@ -22,7 +22,7 @@
 
 package org.jboss.as.txn;
 
-import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.jboss.as.util.SetContextLoaderAction;
 import org.jboss.msc.service.BatchBuilder;
@@ -35,18 +35,18 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 /**
- * Service responsible for getting the {@link TransactionManager}.
+ * Service responsible for getting the {@link UserTransaction}.
  *
  * @author Thomas.Diesler@jboss.com
  * @since 29-Oct-2010
  */
-public class TransactionManagerService implements Service<TransactionManagerService> {
-    public static final ServiceName SERVICE_NAME = TxnServices.JBOSS_TXN_TRANSACTION_MANAGER;
+public class UserTransactionService implements Service<UserTransactionService> {
+    public static final ServiceName SERVICE_NAME = TxnServices.JBOSS_TXN_USER_TRANSACTION;
 
     private InjectedValue<com.arjuna.ats.jbossatx.jta.TransactionManagerService> injectedArjunaTM = new InjectedValue<com.arjuna.ats.jbossatx.jta.TransactionManagerService>();
 
     public static void addService(final BatchBuilder batchBuilder) {
-        TransactionManagerService service = new TransactionManagerService();
+        UserTransactionService service = new UserTransactionService();
         BatchServiceBuilder<?> serviceBuilder = batchBuilder.addService(SERVICE_NAME, service);
         serviceBuilder.addDependency(ArjunaTransactionManagerService.SERVICE_NAME, com.arjuna.ats.jbossatx.jta.TransactionManagerService.class, service.injectedArjunaTM);
     }
@@ -57,17 +57,17 @@ public class TransactionManagerService implements Service<TransactionManagerServ
     public synchronized void stop(StopContext context) {
     }
 
-    public TransactionManager getTransactionManager() throws IllegalStateException {
+    public UserTransaction getUserTransaction() throws IllegalStateException {
         ClassLoader tccl = SetContextLoaderAction.setContextLoader(getClass().getClassLoader());
         try {
-            return injectedArjunaTM.getValue().getTransactionManager();
+            return injectedArjunaTM.getValue().getUserTransaction();
         } finally {
             SetContextLoaderAction.setContextLoader(tccl);
         }
     }
 
     @Override
-    public TransactionManagerService getValue() throws IllegalStateException {
+    public UserTransactionService getValue() throws IllegalStateException {
         return this;
     }
 }

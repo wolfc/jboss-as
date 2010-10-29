@@ -19,31 +19,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.jboss.as.util;
 
-package org.jboss.as.txn;
-
-import org.jboss.msc.service.ServiceName;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
- * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
+ * Privileged actions for the thread context ClassLoader.
+ *
+ * @author Thomas.Diesler@jboss.com
+ * @since 29-Oct-2010
  */
-public final class TxnServices {
+public final class SetContextLoaderAction {
 
-    public static final ServiceName JBOSS_TXN = ServiceName.JBOSS.append("txn");
-
-    public static final ServiceName JBOSS_TXN_XA_TERMINATOR = JBOSS_TXN.append("XATerminator");
-
-    public static final ServiceName JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER = JBOSS_TXN.append("ArjunaTransactionManager");
-
-    public static final ServiceName JBOSS_TXN_TRANSACTION_MANAGER = JBOSS_TXN.append("TransactionManager");
-
-    public static final ServiceName JBOSS_TXN_USER_TRANSACTION = JBOSS_TXN.append("UserTransaction");
-
-    public static <T> T notNull(T value) {
-        if (value == null) throw new IllegalStateException("Service not started");
-        return value;
+    // Hide ctor
+    private SetContextLoaderAction() {
     }
 
-    private TxnServices() {
+    /**
+     * Set the thread context class loader
+     *
+     * @return The class loader previously associated with the current thread
+     */
+    public static ClassLoader setContextLoader(final ClassLoader classLoader) {
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            @Override
+            public ClassLoader run() {
+                Thread currentThread = Thread.currentThread();
+                ClassLoader current = currentThread.getContextClassLoader();
+                currentThread.setContextClassLoader(classLoader);
+                return current;
+            }
+        });
     }
 }

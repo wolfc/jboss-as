@@ -37,7 +37,7 @@
         <module name="org.jboss.vfs"/>
         <module name="org.jboss.osgi.framework"/>
         <module name="org.jboss.staxmapper"/>
-        <module name="org.osgi.core"/>
+        <module name="org.osgi.core" export="true"/>
         <module name="system"/>
     </dependencies>
 </module>

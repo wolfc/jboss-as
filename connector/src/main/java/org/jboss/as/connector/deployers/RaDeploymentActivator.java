@@ -138,7 +138,7 @@ public class RaDeploymentActivator implements ServiceActivator {
 
         ParsedRaDeploymentProcessor parsedRaDeploymentProcessor = new ParsedRaDeploymentProcessor();
         addDeploymentProcessor(batchBuilder, parsedRaDeploymentProcessor, ParsedRaDeploymentProcessor.PRIORITY)
-                .addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER,
+                .addDependency(TxnServices.JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER,
                         com.arjuna.ats.jbossatx.jta.TransactionManagerService.class,
                         parsedRaDeploymentProcessor.getTxmInjector())
                 .addDependency(ConnectorServices.IRONJACAMAR_MDR, MetadataRepository.class,
@@ -153,7 +153,7 @@ public class RaDeploymentActivator implements ServiceActivator {
 
         RaXmlDeploymentProcessor raXmlDeploymentProcessor = new RaXmlDeploymentProcessor();
         addDeploymentProcessor(batchBuilder, raXmlDeploymentProcessor, RaXmlDeploymentProcessor.PRIORITY)
-                .addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER,
+                .addDependency(TxnServices.JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER,
                         com.arjuna.ats.jbossatx.jta.TransactionManagerService.class, raXmlDeploymentProcessor.getTxmInjector())
                 .addDependency(ConnectorServices.IRONJACAMAR_MDR, MetadataRepository.class, raXmlDeploymentProcessor.getMdrInjector())
                 .addDependency(ConnectorServices.RESOURCE_ADAPTER_REGISTRY_SERVICE, ResourceAdapterDeploymentRegistry.class,

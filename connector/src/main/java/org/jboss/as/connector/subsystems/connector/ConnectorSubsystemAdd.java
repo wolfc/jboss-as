@@ -96,7 +96,7 @@ public final class ConnectorSubsystemAdd extends AbstractSubsystemAdd<ConnectorS
                 defaultBootCtxService.getWorkManagerValueInjector());
         defaultBootCtxServiceBuilder.addDependency(TxnServices.JBOSS_TXN_XA_TERMINATOR, JBossXATerminator.class,
                 defaultBootCtxService.getXaTerminatorInjector());
-        defaultBootCtxServiceBuilder.addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER,
+        defaultBootCtxServiceBuilder.addDependency(TxnServices.JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER,
                 com.arjuna.ats.jbossatx.jta.TransactionManagerService.class, defaultBootCtxService.getTxManagerInjector());
 
         defaultBootCtxServiceBuilder.setInitialMode(Mode.ACTIVE);
