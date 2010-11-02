@@ -206,7 +206,7 @@ public class DsDeploymentProcessor implements DeploymentUnitProcessor {
         protected Object initAndInject(String className, List<? extends ConfigProperty> configs, ClassLoader cl)
                 throws DeployException {
             try {
-                Class clz = Class.forName(className, true, cl);
+                Class<?> clz = Class.forName(className, true, cl);
                 Object o = clz.newInstance();
 
                 if (configs != null) {

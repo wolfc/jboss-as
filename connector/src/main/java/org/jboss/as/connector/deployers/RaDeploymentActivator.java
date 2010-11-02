@@ -173,7 +173,7 @@ public class RaDeploymentActivator implements ServiceActivator {
 
         DsDeploymentProcessor dsDeploymentProcessor = new DsDeploymentProcessor();
         addDeploymentProcessor(batchBuilder, dsDeploymentProcessor, DsDeploymentProcessor.PRIORITY)
-                .addDependency(TxnServices.JBOSS_TXN_TRANSACTION_MANAGER,
+                .addDependency(TxnServices.JBOSS_TXN_ARJUNA_TRANSACTION_MANAGER,
                         com.arjuna.ats.jbossatx.jta.TransactionManagerService.class, dsDeploymentProcessor.getTxmInjector())
                 .addDependency(ConnectorServices.IRONJACAMAR_MDR, MetadataRepository.class, dsDeploymentProcessor.getMdrInjector())
                 .addDependency(ConnectorServices.RESOURCE_ADAPTER_REGISTRY_SERVICE, ResourceAdapterDeploymentRegistry.class,
