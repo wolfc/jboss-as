@@ -26,6 +26,7 @@ import org.jboss.as.model.AbstractSubsystemAdd;
 import org.jboss.as.model.UpdateContext;
 import org.jboss.as.model.UpdateResultHandler;
 import org.jboss.as.naming.InitialContextFactoryBuilder;
+import org.jboss.as.naming.InitialContextOSGiService;
 import org.jboss.as.naming.NamingContext;
 import org.jboss.as.naming.context.NamespaceObjectFactory;
 import org.jboss.as.naming.context.ObjectFactoryBuilder;
@@ -74,6 +75,8 @@ public final class NamingSubsystemAdd extends AbstractSubsystemAdd<NamingSubsyst
         addContextFactory(builder, "app");
         addContextFactory(builder, "module");
         addContextFactory(builder, "comp");
+
+        InitialContextOSGiService.addService(builder);
 
         final JndiView jndiView = new JndiView();
         builder.addService(ServiceName.JBOSS.append("naming", "jndi", "view"), jndiView)

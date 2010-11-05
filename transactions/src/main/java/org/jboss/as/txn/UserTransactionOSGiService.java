@@ -40,7 +40,7 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * Service that registers the {@link UserTransaction} as OSGi service.
+ * Service responsible for providing the {@link UserTransaction} as OSGi service.
  *
  * @author Thomas.Diesler@jboss.com
  * @since 29-Oct-2010

@@ -20,10 +20,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.txn;
+package org.jboss.as.naming;
 
-import javax.transaction.TransactionManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
+import org.jboss.as.naming.service.NamingService;
 import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.msc.service.BatchBuilder;
 import org.jboss.msc.service.BatchServiceBuilder;
@@ -40,45 +42,49 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * Service responsible for providing the {@link TransactionManager} as OSGi service.
+ * Service responsible for providing the {@link InitialContext} as OSGi service.
  *
  * @author Thomas.Diesler@jboss.com
  * @since 29-Oct-2010
  */
-public class TransactionManagerOSGiService implements Service<TransactionManagerService> {
+public class InitialContextOSGiService implements Service<Void> {
 
-    public static final ServiceName SERVICE_NAME = ServiceName.JBOSS.append("osgi", "TransactionManager");
+    public static final ServiceName SERVICE_NAME = ServiceName.JBOSS.append("osgi", "InitialContext");
 
-    private InjectedValue<TransactionManagerService> injectedTransactionManager = new InjectedValue<TransactionManagerService>();
+    private InjectedValue<NamingStore> injectedNamingStore = new InjectedValue<NamingStore>();
     private InjectedValue<BundleContext> injectedBundleContext = new InjectedValue<BundleContext>();
 
     public static void addService(final BatchBuilder batchBuilder) {
-        TransactionManagerOSGiService service = new TransactionManagerOSGiService();
+        InitialContextOSGiService service = new InitialContextOSGiService();
         BatchServiceBuilder<?> serviceBuilder = batchBuilder.addService(SERVICE_NAME, service);
-        serviceBuilder.addDependency(TransactionManagerService.SERVICE_NAME, TransactionManagerService.class, service.injectedTransactionManager);
+        serviceBuilder.addDependency(NamingService.SERVICE_NAME, NamingStore.class, service.injectedNamingStore);
         serviceBuilder.addDependency(BundleContextService.SERVICE_NAME, BundleContext.class, service.injectedBundleContext);
         serviceBuilder.setInitialMode(Mode.PASSIVE);
     }
 
     public synchronized void start(StartContext context) throws StartException {
         BundleContext systemContext = injectedBundleContext.getValue();
-        ServiceFactory serviceFactory = new TransactionManagerFactory();
-        systemContext.registerService(TransactionManager.class.getName(), serviceFactory, null);
+        ServiceFactory serviceFactory = new InitialContextServiceFactory();
+        systemContext.registerService(InitialContext.class.getName(), serviceFactory, null);
     }
 
     public synchronized void stop(StopContext context) {
     }
 
     @Override
-    public TransactionManagerService getValue() throws IllegalStateException {
-        return injectedTransactionManager.getValue();
+    public Void getValue() throws IllegalStateException {
+        return null;
     }
 
-    class TransactionManagerFactory implements ServiceFactory {
+    class InitialContextServiceFactory implements ServiceFactory {
 
         @Override
         public Object getService(Bundle bundle, ServiceRegistration sreg) {
-            return injectedTransactionManager.getValue().getTransactionManager();
+            try {
+                return new InitialContext();
+            } catch (NamingException ex) {
+                throw new IllegalStateException("Cannot obtain InitialContext", ex);
+            }
         }
 
         @Override

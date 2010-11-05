@@ -22,12 +22,15 @@
 
 package org.jboss.as.naming;
 
-import javax.naming.spi.NamingManager;
-import org.jboss.as.naming.context.ObjectFactoryBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.jboss.as.naming.util.NamingUtils.asReference;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
 
 import javax.naming.Binding;
 import javax.naming.CompositeName;
@@ -42,15 +45,11 @@ import javax.naming.NamingEnumeration;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 import javax.naming.spi.ObjectFactory;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Set;
 
-import static org.jboss.as.naming.util.NamingUtils.asReference;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author John E. Bailey
