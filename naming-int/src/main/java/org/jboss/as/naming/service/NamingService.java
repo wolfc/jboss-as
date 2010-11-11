@@ -22,8 +22,6 @@
 
 package org.jboss.as.naming.service;
 
-import javax.naming.NamingException;
-
 import org.jboss.as.naming.InMemoryNamingStore;
 import org.jboss.as.naming.NamingContext;
 import org.jboss.as.naming.NamingEventCoordinator;
@@ -34,6 +32,8 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+
+import javax.naming.NamingException;
 
 /**
  * Service responsible for creating and managing the life-cycle of the Naming Server.

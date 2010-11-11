@@ -22,8 +22,6 @@
 
 package org.jboss.as.naming.service;
 
-import java.util.List;
-
 import org.jboss.as.model.AbstractSubsystemElement;
 import org.jboss.as.model.AbstractSubsystemUpdate;
 import org.jboss.as.model.UpdateContext;
@@ -31,6 +29,7 @@ import org.jboss.as.model.UpdateResultHandler;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
 import javax.xml.stream.XMLStreamException;
+import java.util.List;
 
 /**
  * Subsystem element representing the naming subsystem.

@@ -25,11 +25,9 @@ package org.jboss.as.naming.service;
 import org.jboss.as.model.AbstractSubsystemAdd;
 import org.jboss.as.model.UpdateContext;
 import org.jboss.as.model.UpdateResultHandler;
-import org.jboss.as.naming.InitialContextFactoryBuilder;
-import org.jboss.as.naming.InitialContextOSGiService;
+//import org.jboss.as.naming.InitialContextOSGiService;
 import org.jboss.as.naming.NamingContext;
 import org.jboss.as.naming.context.NamespaceObjectFactory;
-import org.jboss.as.naming.context.ObjectFactoryBuilder;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.BatchBuilder;
 import org.jboss.msc.service.ServiceName;
@@ -37,9 +35,7 @@ import org.jboss.msc.value.Values;
 
 import javax.management.MBeanServer;
 import javax.naming.Context;
-import javax.naming.NamingException;
 import javax.naming.Reference;
-import javax.naming.spi.NamingManager;
 
 /**
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
@@ -57,7 +53,7 @@ public final class NamingSubsystemAdd extends AbstractSubsystemAdd<NamingSubsyst
     protected <P> void applyUpdate(final UpdateContext updateContext, final UpdateResultHandler<? super Void, P> resultHandler, final P param) {
         log.info("Activating Naming Subsystem");
 
-        NamingContext.initializeNamingManager();
+        NamingContext.initializeNamingManager(ObjectFactoryBuilder.INSTANCE);
 
         // Create the Naming Service
         final BatchBuilder builder = updateContext.getBatchBuilder();
@@ -76,7 +72,8 @@ public final class NamingSubsystemAdd extends AbstractSubsystemAdd<NamingSubsyst
         addContextFactory(builder, "module");
         addContextFactory(builder, "comp");
 
-        InitialContextOSGiService.addService(builder);
+        // TODO: fix me
+        //InitialContextOSGiService.addService(builder);
 
         final JndiView jndiView = new JndiView();
         builder.addService(ServiceName.JBOSS.append("naming", "jndi", "view"), jndiView)

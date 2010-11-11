@@ -39,18 +39,10 @@
     <name>JBoss Application Server: Naming Subsystem</name>
 
     <dependencies>
-        <dependency>
-            <groupId>org.jboss.msc</groupId>
-            <artifactId>jboss-msc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-domain</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-osgi</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>org.jboss.logging</groupId>
+           <artifactId>jboss-logging</artifactId>
+       </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

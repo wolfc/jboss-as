@@ -20,11 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.naming;
+package org.jboss.as.naming.osgi;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
+import org.jboss.as.naming.NamingStore;
 import org.jboss.as.naming.service.NamingService;
 import org.jboss.as.osgi.service.BundleContextService;
 import org.jboss.msc.service.BatchBuilder;
@@ -40,6 +38,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
+
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 /**
  * Service responsible for providing the {@link InitialContext} as OSGi service.

@@ -20,22 +20,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.naming;
+package org.jboss.as.naming.service;
 
-import java.util.Hashtable;
+import org.jboss.as.naming.InMemoryNamingStore;
+import org.jboss.as.naming.NamingContext;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.Reference;
-import javax.naming.spi.NamingManager;
 import javax.naming.spi.ObjectFactory;
-import org.jboss.as.naming.context.ObjectFactoryBuilder;
-import org.junit.After;
+import java.util.Hashtable;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * @author John Bailey
@@ -45,7 +47,7 @@ public class ObjectFactoryTestCase {
 
     @BeforeClass
     public static void initNamingManager() throws Exception {
-        NamingContext.initializeNamingManager();
+        NamingContext.initializeNamingManager(ObjectFactoryBuilder.INSTANCE);
     }
 
     @Before

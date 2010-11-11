@@ -22,7 +22,7 @@
 
 package org.jboss.as.deployment.managedbean.container;
 
-import org.jboss.as.naming.context.ModularReference;
+import org.jboss.as.naming.service.ModularReference;
 import org.jboss.modules.Module;
 
 import javax.naming.Context;

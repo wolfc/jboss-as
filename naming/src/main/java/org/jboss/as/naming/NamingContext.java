@@ -22,10 +22,9 @@
 
 package org.jboss.as.naming;
 
-import javax.naming.spi.ObjectFactory;
-import org.jboss.as.naming.context.ObjectFactoryBuilder;
 import org.jboss.as.naming.util.NameParser;
 import org.jboss.as.naming.util.NamingUtils;
+import org.jboss.logging.Logger;
 
 import javax.naming.Binding;
 import javax.naming.CannotProceedException;
@@ -42,6 +41,8 @@ import javax.naming.Referenceable;
 import javax.naming.event.EventContext;
 import javax.naming.event.NamingListener;
 import javax.naming.spi.NamingManager;
+import javax.naming.spi.ObjectFactory;
+import javax.naming.spi.ObjectFactoryBuilder;
 import javax.naming.spi.ResolveResult;
 import java.util.Hashtable;
 
@@ -53,7 +54,6 @@ import static org.jboss.as.naming.util.NamingUtils.isEmpty;
 import static org.jboss.as.naming.util.NamingUtils.namingEnumeration;
 import static org.jboss.as.naming.util.NamingUtils.namingException;
 import static org.jboss.as.naming.util.NamingUtils.notAContextException;
-import org.jboss.logging.Logger;
 
 /**
  * Naming context implementation which proxies calls to a {@code NamingStore} instance.
@@ -79,10 +79,12 @@ public class NamingContext implements EventContext {
 
     private static final String PACKAGE_PREFIXES = "org.jboss.as.naming.interfaces";
 
+    private static ObjectFactoryBuilder objectFactoryBuilder;
+
     /**
      * Initialize the naming components required by {@link javax.naming.spi.NamingManager}.
      */
-    public static void initializeNamingManager() {
+    public static void initializeNamingManager(ObjectFactoryBuilder objectFactoryBuilder) {
         // Setup naming environment
         System.setProperty(Context.URL_PKG_PREFIXES, PACKAGE_PREFIXES);
         try {
@@ -93,7 +95,8 @@ public class NamingContext implements EventContext {
             log.warn("Failed to set InitialContextFactoryBuilder", e);
         }
         try {
-            NamingManager.setObjectFactoryBuilder(ObjectFactoryBuilder.INSTANCE);
+            NamingManager.setObjectFactoryBuilder(objectFactoryBuilder);
+            NamingContext.objectFactoryBuilder = objectFactoryBuilder;
         } catch(Throwable t) {
             log.warn("Failed to set ObjectFactoryBuilder", t);
         }
@@ -454,7 +457,7 @@ public class NamingContext implements EventContext {
 
     private Object getObjectInstance(final Object object, final Name name, final Hashtable environment) throws NamingException {
         try {
-            final ObjectFactoryBuilder factoryBuilder = ObjectFactoryBuilder.INSTANCE;
+            final ObjectFactoryBuilder factoryBuilder = objectFactoryBuilder;
             final ObjectFactory objectFactory = factoryBuilder.createObjectFactory(object, environment);
             return objectFactory.getObjectInstance(object, name, this, environment);
         } catch(NamingException e) {

@@ -20,17 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.jboss.as.naming.context;
+package org.jboss.as.naming.service;
 
-import java.util.Hashtable;
+import org.jboss.modules.Module;
+
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
+import java.util.Hashtable;
+
 import static org.jboss.as.naming.util.NamingUtils.asReference;
 import static org.jboss.as.naming.util.NamingUtils.namingException;
-import org.jboss.modules.Module;
 
 /**
  * ObjectFactoryBuilder implementation used to support custom object factories being loaded from modules. This class

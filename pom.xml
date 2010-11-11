@@ -148,6 +148,8 @@
         <module>logging</module>
         <module>transactions</module>
         <module>naming</module>
+        <module>naming-int</module>
+        <module>naming-osgi</module>
         <module>jmx</module>
         <module>sar</module>
         <module>managedbeans</module>
@@ -407,6 +409,12 @@
             <dependency>
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-naming</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>jboss-as-naming-int</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

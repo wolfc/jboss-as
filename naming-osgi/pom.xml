@@ -33,43 +33,21 @@
     </parent>
 
     <groupId>org.jboss.as</groupId>
-    <artifactId>jboss-as-managed-beans</artifactId>
+    <artifactId>jboss-as-naming-osgi</artifactId>
     <version>7.0.0.Alpha2-SNAPSHOT</version>
 
-    <name>JBoss Application Server: Managed Beans Subsystem</name>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <includes>
-                        <include>**/*TestCase.java</include>
-                    </includes>
-                    <enableAssertions>false</enableAssertions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <name>JBoss Application Server: Naming Subsystem</name>
 
     <dependencies>
-        <dependency>
-            <groupId>org.jboss.msc</groupId>
-            <artifactId>jboss-msc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-domain</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-naming-int</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.1_spec</artifactId>
+            <groupId>org.jboss.as</groupId>
+            <artifactId>jboss-as-osgi</artifactId>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

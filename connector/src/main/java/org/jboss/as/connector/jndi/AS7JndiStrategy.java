@@ -22,9 +22,11 @@
 
 package org.jboss.as.connector.jndi;
 
-import java.util.Hashtable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import org.jboss.as.naming.service.ModularReference;
+import org.jboss.jca.core.spi.naming.JndiStrategy;
+import org.jboss.logging.Logger;
+import org.jboss.util.naming.Util;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.Name;
@@ -32,10 +34,9 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 import javax.resource.Referenceable;
-import org.jboss.as.naming.context.ModularReference;
-import org.jboss.jca.core.spi.naming.JndiStrategy;
-import org.jboss.logging.Logger;
-import org.jboss.util.naming.Util;
+import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  *
