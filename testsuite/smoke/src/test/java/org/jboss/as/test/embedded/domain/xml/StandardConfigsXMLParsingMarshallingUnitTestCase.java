@@ -21,28 +21,7 @@
  */
 package org.jboss.as.test.embedded.domain.xml;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
-
 import junit.framework.Assert;
-
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.model.AbstractDomainModelUpdate;
@@ -62,6 +41,25 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
 import org.jboss.staxmapper.XMLMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A XSDValidationUnitTestCase.
@@ -234,6 +232,12 @@ public class StandardConfigsXMLParsingMarshallingUnitTestCase {
     }
 
     private static String getASHome() {
+       // For Aquillian to function jboss.home system property is already set
+       String home = System.getProperty("jboss.home");
+       if(home != null)
+         return home;
+       // In Intellij the default working directory is the top-level project project directory. Eventually
+       // this results in the following code returning null. Using jboss.home system property negates this issue.
        File f = new File(".");
        f = f.getAbsoluteFile();
        while(f.getParentFile() != null) {
