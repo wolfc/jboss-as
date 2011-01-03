@@ -16,23 +16,22 @@
  */
 package org.jboss.as.arquillian.jmx;
 
+import org.jboss.arquillian.spi.TestResult;
+import org.jboss.arquillian.spi.TestResult.Status;
+import org.jboss.arquillian.spi.TestRunner;
+import org.jboss.arquillian.spi.util.TestRunners;
+import org.jboss.logging.Logger;
+
+import javax.management.JMException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
-
-import javax.management.JMException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-import javax.management.StandardMBean;
-
-import org.jboss.arquillian.spi.TestResult;
-import org.jboss.arquillian.spi.TestRunner;
-import org.jboss.arquillian.spi.TestResult.Status;
-import org.jboss.arquillian.spi.util.TestRunners;
-import org.jboss.logging.Logger;
 
 /**
  * An MBean to run test methods in container.
@@ -89,6 +88,9 @@ public abstract class JMXTestRunner implements JMXTestRunnerMBean {
     public InputStream runTestMethodEmbedded(String className, String methodName, Map<String, String> props) {
         TestResult result = runTestMethodInternal(className, methodName, props);
 
+        if(!testPassed(result))
+            throw new RuntimeException(result.getThrowable());
+
         // Marshall the TestResult
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -122,5 +124,9 @@ public abstract class JMXTestRunner implements JMXTestRunnerMBean {
         } catch (Throwable th) {
             return new TestResult(Status.FAILED, th);
         }
+    }
+
+    private static boolean testPassed(TestResult result) {
+        return result.getStatus().equals(TestResult.Status.PASSED);
     }
 }
