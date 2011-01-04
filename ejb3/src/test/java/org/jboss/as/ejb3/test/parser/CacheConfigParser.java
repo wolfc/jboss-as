@@ -19,12 +19,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.ejb3;
+package org.jboss.as.ejb3.test.parser;
 
-import org.jboss.as.ExtensionContext;
-import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
-import org.jboss.as.ejb3.parser.Element;
-import org.jboss.as.ejb3.parser.Namespace;
 import org.jboss.as.model.ParseResult;
 import org.jboss.as.model.ParseUtils;
 import org.jboss.staxmapper.XMLElementReader;
@@ -35,33 +31,25 @@ import javax.xml.stream.XMLStreamException;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 
 /**
- * Create a subsystem add directive from the given XML input.
- *
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
-public class EJB3SubsystemParser implements XMLElementReader<ParseResult<ExtensionContext.SubsystemConfiguration<EJB3SubsystemElement>>> {
-   protected static final String NAMESPACE = Namespace.EJB3_1_0.getUriString();
-
-   private static final EJB3SubsystemParser instance = new EJB3SubsystemParser();
-
-   public static EJB3SubsystemParser getInstance() {
-      return instance;
-   }
+public class CacheConfigParser implements XMLElementReader<ParseResult<CacheConfig>> {
+   public static final String NAMESPACE = Namespace.TEST_1_0.getUriString();
 
    @Override
-   public void readElement(XMLExtendedStreamReader reader, ParseResult<ExtensionContext.SubsystemConfiguration<EJB3SubsystemElement>> result)
+   public void readElement(XMLExtendedStreamReader reader, ParseResult<CacheConfig> result)
            throws XMLStreamException {
-      // parse <jboss-ejb3> domain element
-
-      EJB3SubsystemAdd subsystem = new EJB3SubsystemAdd();
-
+      CacheConfig value = new CacheConfig();
       while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
          switch (Namespace.forUri(reader.getNamespaceURI())) {
-            case EJB3_1_0:
+            case TEST_1_0:
                final Element element = Element.forName(reader.getLocalName());
                switch (element) {
-                  case ASSEMBLY_DESCRIPTOR:
-                     subsystem.setAssemblyDescriptor(parseAssemblyDescriptor(reader));
+                  case CACHE_NAME:
+                     value.setCacheName(reader.getElementText());
+                     break;
+                  case EJB_NAME:
+                     value.setEjbName(reader.getElementText());
                      break;
                   default:
                      throw ParseUtils.unexpectedElement(reader);
@@ -71,21 +59,6 @@ public class EJB3SubsystemParser implements XMLElementReader<ParseResult<Extensi
                throw ParseUtils.unexpectedElement(reader);
          }
       }
-      result.setResult(new ExtensionContext.SubsystemConfiguration<EJB3SubsystemElement>(subsystem));
-   }
-
-   private static JBossAssemblyDescriptor parseAssemblyDescriptor(XMLExtendedStreamReader reader) throws XMLStreamException {
-      JBossAssemblyDescriptor assemblyDescriptor = new JBossAssemblyDescriptor();
-      while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
-         final Element element = Element.forName(reader.getLocalName());
-         switch (element) {
-            case UNKNOWN:
-               ParseResult<?> result = new ParseResult<Object>();
-               reader.handleAny(result);
-               assemblyDescriptor.addAny(result.getResult());
-               break;
-         }
-      }
-      return assemblyDescriptor;
+      result.setResult(value);
    }
 }

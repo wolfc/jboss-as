@@ -21,6 +21,7 @@
  */
 package org.jboss.as.ejb3;
 
+import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.model.AbstractSubsystemAdd;
 import org.jboss.as.model.BootUpdateContext;
 import org.jboss.as.model.UpdateContext;
@@ -32,8 +33,10 @@ import org.jboss.as.model.UpdateResultHandler;
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
 public class EJB3SubsystemAdd extends AbstractSubsystemAdd<EJB3SubsystemElement> {
-   protected EJB3SubsystemAdd(final String namespaceUri) {
-      super(namespaceUri);
+   private JBossAssemblyDescriptor assemblyDescriptor;
+
+   protected EJB3SubsystemAdd() {
+      super(EJB3SubsystemParser.NAMESPACE);
    }
 
    @Override
@@ -55,5 +58,13 @@ public class EJB3SubsystemAdd extends AbstractSubsystemAdd<EJB3SubsystemElement>
    @Override
    protected EJB3SubsystemElement createSubsystemElement() {
       return new EJB3SubsystemElement();
+   }
+
+   protected JBossAssemblyDescriptor getAssemblyDescriptor() {
+      return assemblyDescriptor;
+   }
+
+   protected void setAssemblyDescriptor(JBossAssemblyDescriptor assemblyDescriptor) {
+      this.assemblyDescriptor = assemblyDescriptor;
    }
 }
