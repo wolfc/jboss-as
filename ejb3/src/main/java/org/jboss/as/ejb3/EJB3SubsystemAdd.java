@@ -22,16 +22,17 @@
 
 package org.jboss.as.ejb3;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-
 import org.jboss.as.controller.Cancellable;
 import org.jboss.as.controller.ModelAddOperationHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.server.BootOperationContext;
 import org.jboss.as.server.BootOperationHandler;
 import org.jboss.dmr.ModelNode;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
 /**
  * @author Emanuel Muckenhuber
@@ -39,6 +40,8 @@ import org.jboss.dmr.ModelNode;
 class Ejb3SubsystemAdd implements ModelAddOperationHandler, BootOperationHandler {
 
     static final Ejb3SubsystemAdd INSTANCE = new Ejb3SubsystemAdd();
+
+    private JBossAssemblyDescriptor assemblyDescriptor;
 
     private Ejb3SubsystemAdd() {
         //
@@ -54,7 +57,11 @@ class Ejb3SubsystemAdd implements ModelAddOperationHandler, BootOperationHandler
             final BootOperationContext updateContext = (BootOperationContext) context;
 
             // TODO add ejb3 deployers
-
+            // add the metadata parser deployment processor
+            // TODO
+            // add the real deployment processor
+            // TODO: add the proper deployment processors
+            // updateContext.addDeploymentProcessor(processor, priority);
         }
 
         context.getSubModel().setEmptyObject();
@@ -64,4 +71,11 @@ class Ejb3SubsystemAdd implements ModelAddOperationHandler, BootOperationHandler
         return Cancellable.NULL;
     }
 
+    protected JBossAssemblyDescriptor getAssemblyDescriptor() {
+       return assemblyDescriptor;
+    }
+
+    protected void setAssemblyDescriptor(JBossAssemblyDescriptor assemblyDescriptor) {
+       this.assemblyDescriptor = assemblyDescriptor;
+    }
 }

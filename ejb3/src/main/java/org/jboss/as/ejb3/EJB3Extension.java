@@ -22,27 +22,13 @@
 
 package org.jboss.as.ejb3;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
-
-import java.util.List;
-
-import javax.xml.stream.XMLStreamException;
-
 import org.jboss.as.controller.Extension;
 import org.jboss.as.controller.ExtensionContext;
 import org.jboss.as.controller.SubsystemRegistration;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
-import org.jboss.as.controller.parsing.ParseUtils;
-import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.as.controller.registry.ModelNodeRegistration;
-import org.jboss.dmr.ModelNode;
-import org.jboss.staxmapper.XMLElementReader;
-import org.jboss.staxmapper.XMLElementWriter;
-import org.jboss.staxmapper.XMLExtendedStreamReader;
-import org.jboss.staxmapper.XMLExtendedStreamWriter;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 
 /**
  * @author Emanuel Muckenhuber
@@ -69,28 +55,4 @@ public class EJB3Extension implements Extension {
     public void initializeParsers(ExtensionParsingContext context) {
         context.setSubsystemXmlMapping(NAMESPACE, parser);
     }
-
-    static class EJB3SubsystemParser implements XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
-
-        /** {@inheritDoc} */
-        @Override
-        public void writeContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
-            // //TODO seems to be a problem with empty elements cleaning up the queue in FormattingXMLStreamWriter.runAttrQueue
-            //context.startSubsystemElement(NewManagedBeansExtension.NAMESPACE, true);
-            context.startSubsystemElement(NAMESPACE, false);
-            writer.writeEndElement();
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public void readElement(final XMLExtendedStreamReader reader, final List<ModelNode> list) throws XMLStreamException {
-            ParseUtils.requireNoAttributes(reader);
-            ParseUtils.requireNoContent(reader);
-            final ModelNode update = new ModelNode();
-            update.get(OP).set(ADD);
-            update.get(OP_ADDR).add(SUBSYSTEM, SUBSYSTEM_NAME);
-            list.add(update);
-        }
-    }
-
 }
