@@ -23,7 +23,6 @@ package org.jboss.as.ejb3;
 
 import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
-import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.ejb3.parser.Element;
 import org.jboss.as.ejb3.parser.Namespace;
 import org.jboss.dmr.ModelNode;
@@ -32,7 +31,6 @@ import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
 import java.util.List;
