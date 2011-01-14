@@ -21,7 +21,6 @@
  */
 package org.jboss.as.ejb3;
 
-import org.jboss.as.ExtensionContext;
 import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.ejb3.parser.Element;
 import org.jboss.as.ejb3.parser.Namespace;
