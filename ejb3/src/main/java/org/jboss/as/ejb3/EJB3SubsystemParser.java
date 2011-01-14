@@ -21,12 +21,12 @@
  */
 package org.jboss.as.ejb3;
 
-import org.jboss.as.ExtensionContext;
 import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.ejb3.parser.Element;
 import org.jboss.as.ejb3.parser.Namespace;
 import org.jboss.as.model.ParseResult;
 import org.jboss.as.model.ParseUtils;
+import org.jboss.as.server.ExtensionContext;
 import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 

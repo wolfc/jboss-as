@@ -21,11 +21,11 @@
  */
 package org.jboss.as.ejb3;
 
-import org.jboss.as.ExtensionContext;
 import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.ejb3.test.parser.CacheConfig;
 import org.jboss.as.ejb3.test.parser.CacheConfigParser;
 import org.jboss.as.model.ParseResult;
+import org.jboss.as.server.ExtensionContext;
 import org.jboss.staxmapper.XMLMapper;
 import org.junit.Test;
 
