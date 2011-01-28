@@ -98,9 +98,9 @@
         <version.org.jboss.marshalling.jboss-marshalling-river>1.3.0.CR8</version.org.jboss.marshalling.jboss-marshalling-river>
         <version.org.jboss.msc.jboss-msc>1.0.0.Beta5</version.org.jboss.msc.jboss-msc>
         <version.org.jboss.modules.jboss-modules>1.0.0.Beta13</version.org.jboss.modules.jboss-modules>
-        <version.org.jboss.metadata.common>7.0.0.Alpha3</version.org.jboss.metadata.common>
-        <version.org.jboss.metadata.web>7.0.0.Alpha3</version.org.jboss.metadata.web>
-        <version.org.jboss.metadata.ear>7.0.0.Alpha3</version.org.jboss.metadata.ear>
+        <version.org.jboss.metadata.common>7.0.0.Alpha4</version.org.jboss.metadata.common>
+        <version.org.jboss.metadata.web>7.0.0.Alpha4</version.org.jboss.metadata.web>
+        <version.org.jboss.metadata.ear>7.0.0.Alpha4</version.org.jboss.metadata.ear>
         <version.org.jboss.netty>3.2.1.Final</version.org.jboss.netty>
         <version.org.jboss.osgi.common>1.0.6</version.org.jboss.osgi.common>
         <version.org.jboss.osgi.deployment>1.0.10</version.org.jboss.osgi.deployment>
@@ -310,6 +310,8 @@
                                         <searchTransitive>true</searchTransitive>
                                         <excludes>
                                             <!-- Logging dependencies which cause errors -->
+                                            <exclude>apache-xerces:xml-apis</exclude>
+                                            <exclude>apache-xerces:xercesImpl</exclude>
                                             <exclude>jboss:jboss-logging-spi</exclude>
                                             <exclude>org.jboss.logging:jboss-logging-spi</exclude>
                                             <exclude>org.jboss.logging:jboss-logging-log4j</exclude>
