@@ -148,7 +148,8 @@ public class EjbJarParsingDeploymentUnitProcessor implements DeploymentUnitProce
     private XMLStreamReader getXMLStreamReader(VirtualFile ejbJarXml, XMLResolver resolver) throws DeploymentUnitProcessingException {
         InputStream is = null;
         try {
-            is = ejbJarXml.openStream();
+            // TODO: without Dup2: javax.xml.stream.XMLStreamException: ParseError at [row,col]:[1,39] Message: Premature end of file.
+            is = new Dup2(ejbJarXml.openStream());
             final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
             inputFactory.setXMLResolver(resolver);
             XMLStreamReader xmlReader = inputFactory.createXMLStreamReader(is);
