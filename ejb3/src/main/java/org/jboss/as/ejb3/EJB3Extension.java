@@ -38,6 +38,6 @@ public class EJB3Extension implements Extension {
 
    @Override
    public void activate(ServiceActivatorContext context) {
-      throw new RuntimeException("NYI: org.jboss.as.ejb3.EJB3Extension.activate");
+      // purposely left blank
    }
 }

@@ -21,11 +21,13 @@
  */
 package org.jboss.as.ejb3;
 
+import org.jboss.as.ejb3.deployment.EjbJarParsingDeploymentUnitProcessor;
 import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.model.AbstractSubsystemAdd;
 import org.jboss.as.model.BootUpdateContext;
 import org.jboss.as.model.UpdateContext;
 import org.jboss.as.model.UpdateResultHandler;
+import org.jboss.as.server.deployment.Phase;
 
 /**
  * Add the EJB 3 subsystem directive.
@@ -41,13 +43,13 @@ public class EJB3SubsystemAdd extends AbstractSubsystemAdd<EJB3SubsystemElement>
 
    @Override
    protected <P> void applyUpdate(UpdateContext updateContext, UpdateResultHandler<? super Void, P> resultHandler, P param) {
-      throw new RuntimeException("NYI: org.jboss.as.ejb3.EJB3SubsystemAdd.applyUpdate");
+      // purposely left blank
    }
 
    @Override
    protected void applyUpdateBootAction(BootUpdateContext updateContext) {
       // add the metadata parser deployment processor
-      // TODO
+      updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_EJB_DEPLOYMENT, new EjbJarParsingDeploymentUnitProcessor());
       // add the real deployment processor
       // TODO: add the proper deployment processors
       // updateContext.addDeploymentProcessor(processor, priority);
