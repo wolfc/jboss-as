@@ -311,6 +311,8 @@
                                         <searchTransitive>true</searchTransitive>
                                         <excludes>
                                             <!-- Logging dependencies which cause errors -->
+                                            <exclude>apache-xerces:xml-apis</exclude>
+                                            <exclude>apache-xerces:xercesImpl</exclude>
                                             <exclude>jboss:jboss-logging-spi</exclude>
                                             <exclude>org.jboss.logging:jboss-logging-spi</exclude>
                                             <exclude>org.jboss.logging:jboss-logging-log4j</exclude>

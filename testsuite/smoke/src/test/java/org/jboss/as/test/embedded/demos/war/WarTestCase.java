@@ -21,21 +21,23 @@
  */
 package org.jboss.as.test.embedded.demos.war;
 
-import java.net.URL;
-
 import junit.framework.Assert;
-
 import org.jboss.arquillian.api.Deployment;
 import org.jboss.arquillian.api.Run;
 import org.jboss.arquillian.api.RunModeType;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.demos.war.archive.SimpleServlet;
 import org.jboss.as.test.modular.utils.PollingUtils;
-import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
 import org.jboss.as.test.modular.utils.PollingUtils.UrlConnectionTask;
+import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
 import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
 
 /**
  *
@@ -48,6 +50,8 @@ public class WarTestCase {
 
     @Deployment
     public static Archive<?> getDeployment(){
+        System.err.println("URL = " + Thread.currentThread().getContextClassLoader().getResource("META-INF/services/" + DocumentBuilderFactory.class.getName()));
+        System.err.println(Arrays.toString(((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs()));
         return ShrinkWrapUtils.createWebArchive("demos/war-example.war", SimpleServlet.class.getPackage());
     }
 

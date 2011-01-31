@@ -49,6 +49,12 @@
       <dependency>
          <groupId>org.jboss.metadata</groupId>
          <artifactId>jboss-metadata-ejb</artifactId>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jboss</groupId>
+               <artifactId>jbossxb</artifactId>
+            </exclusion>
+         </exclusions>
       </dependency>
 
       <dependency>
