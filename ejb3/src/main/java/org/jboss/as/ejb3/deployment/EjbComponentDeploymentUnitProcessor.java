@@ -34,11 +34,12 @@ import org.jboss.ejb3.effigy.common.JBossBeanEffigyInfo;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.ejb3.effigy.int2.JBossBeanEffigyFactory;
 import org.jboss.logging.Logger;
+import org.jboss.metadata.ejb.jboss.JBoss51MetaData;
+import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeanMetaData;
+import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeansMetaData;
 import org.jboss.metadata.ejb.jboss.JBossSessionBeanMetaData;
 import org.jboss.metadata.ejb.spec.EjbJarMetaData;
-import org.jboss.metadata.ejb.spec.EnterpriseBeanMetaData;
 import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
-import org.jboss.metadata.ejb.spec.SessionBeanMetaData;
 import org.jboss.modules.Module;
 
 /**
@@ -83,12 +84,16 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
             return;
         }
 
-        for (EnterpriseBeanMetaData ejb : ejbs) {
+        JBoss51MetaData jbossMetaData = new JBoss51MetaData();
+        jbossMetaData.merge(null, ejbJarMetaData);
+
+        JBossEnterpriseBeansMetaData jejbs = jbossMetaData.getEnterpriseBeans();
+        for (JBossEnterpriseBeanMetaData ejb : jejbs) {
             if (!ejb.isSession()) {
                 logger.warn("Only stateless session EJBs are supported currently. Skipping " + ejb.getName() + " from deployment unit: " + deploymentUnit);
                 continue;
             }
-            SessionBeanMetaData sessionBean = (SessionBeanMetaData) ejb;
+            JBossSessionBeanMetaData sessionBean = (JBossSessionBeanMetaData) ejb;
             if (!sessionBean.isStateless()) {
                 logger.warn("Only stateless session EJBs are supported currently. Skipping " + ejb.getName() + " from deployment unit: " + deploymentUnit);
                 continue;
@@ -98,10 +103,9 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
             // TODO: Once we have jboss.xml processing, this won't be needed and we'll solely work on JBossMetaData
             // and JBoss*BeanMetaData
-            JBossSessionBeanMetaData jbossSessionBean = (JBossSessionBeanMetaData) JBossSessionBeanMetaData.newBean(sessionBean);
             // now create Effigy for this EJB and make it available in JNDI so that it can be injected
             // into the StatelessEJBComponent (a.k.a container)
-            JBossSessionBeanEffigy sessionBeanEffigy = this.getJBossSessionBeanEffigy(this.getClassLoader(deploymentUnit), jbossSessionBean);
+            JBossSessionBeanEffigy sessionBeanEffigy = this.getJBossSessionBeanEffigy(this.getClassLoader(deploymentUnit), sessionBean);
             // TODO: Bind it to jndi.
         }
     }
@@ -112,7 +116,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
     }
 
 
-    private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, SessionBeanMetaData sessionBean) {
+    private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
         // TODO: This isn't foolproof yet. Need a better naming
         String ejbComponentName = EJB_COMPONENT_PREFIX + deploymentUnit.getName() + sessionBean.getName();
         ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessEJBComponent.class.getName());
