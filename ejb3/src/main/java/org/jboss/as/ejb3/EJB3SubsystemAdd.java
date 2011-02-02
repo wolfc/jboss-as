@@ -21,6 +21,7 @@
  */
 package org.jboss.as.ejb3;
 
+import org.jboss.as.ejb3.deployment.EjbComponentDeploymentUnitProcessor;
 import org.jboss.as.ejb3.deployment.EjbJarParsingDeploymentUnitProcessor;
 import org.jboss.as.ejb3.metadata.JBossAssemblyDescriptor;
 import org.jboss.as.model.AbstractSubsystemAdd;
@@ -35,38 +36,39 @@ import org.jboss.as.server.deployment.Phase;
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
 public class EJB3SubsystemAdd extends AbstractSubsystemAdd<EJB3SubsystemElement> {
-   private JBossAssemblyDescriptor assemblyDescriptor;
+    private JBossAssemblyDescriptor assemblyDescriptor;
 
-   protected EJB3SubsystemAdd() {
-      super(EJB3SubsystemParser.NAMESPACE);
-   }
+    protected EJB3SubsystemAdd() {
+        super(EJB3SubsystemParser.NAMESPACE);
+    }
 
-   @Override
-   protected <P> void applyUpdate(UpdateContext updateContext, UpdateResultHandler<? super Void, P> resultHandler, P param) {
-      // purposely left blank
-   }
+    @Override
+    protected <P> void applyUpdate(UpdateContext updateContext, UpdateResultHandler<? super Void, P> resultHandler, P param) {
+        // purposely left blank
+    }
 
-   @Override
-   protected void applyUpdateBootAction(BootUpdateContext updateContext) {
-      // add the metadata parser deployment processor
-      updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_EJB_DEPLOYMENT, new EjbJarParsingDeploymentUnitProcessor());
-      // add the real deployment processor
-      // TODO: add the proper deployment processors
-      // updateContext.addDeploymentProcessor(processor, priority);
+    @Override
+    protected void applyUpdateBootAction(BootUpdateContext updateContext) {
+        // add the metadata parser deployment processor
+        updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_EJB_DEPLOYMENT, new EjbJarParsingDeploymentUnitProcessor());
+        updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_EJB_COMPONENT, new EjbComponentDeploymentUnitProcessor());
+        // add the real deployment processor
+        // TODO: add the proper deployment processors
+        // updateContext.addDeploymentProcessor(processor, priority);
 
-      super.applyUpdateBootAction(updateContext);
-   }
+        super.applyUpdateBootAction(updateContext);
+    }
 
-   @Override
-   protected EJB3SubsystemElement createSubsystemElement() {
-      return new EJB3SubsystemElement();
-   }
+    @Override
+    protected EJB3SubsystemElement createSubsystemElement() {
+        return new EJB3SubsystemElement();
+    }
 
-   protected JBossAssemblyDescriptor getAssemblyDescriptor() {
-      return assemblyDescriptor;
-   }
+    protected JBossAssemblyDescriptor getAssemblyDescriptor() {
+        return assemblyDescriptor;
+    }
 
-   protected void setAssemblyDescriptor(JBossAssemblyDescriptor assemblyDescriptor) {
-      this.assemblyDescriptor = assemblyDescriptor;
-   }
+    protected void setAssemblyDescriptor(JBossAssemblyDescriptor assemblyDescriptor) {
+        this.assemblyDescriptor = assemblyDescriptor;
+    }
 }
