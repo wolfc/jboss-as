@@ -120,8 +120,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         // TODO: This isn't foolproof yet. Need a better naming
         String ejbComponentName = EJB_COMPONENT_PREFIX + deploymentUnit.getName() + sessionBean.getName();
         ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessEJBComponent.class.getName(), ManagedBeanComponentFactory.INSTANCE);
-        // hmm, why set it as an attachment?
-        sessionBeanComponentConfig.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
