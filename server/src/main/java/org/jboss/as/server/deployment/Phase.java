@@ -264,6 +264,7 @@ public enum Phase {
     public static final int INSTALL_EE_COMPONENT_INTERCEPTORS           = 0x1100;
     public static final int INSTALL_EE_COMPONENT_INJECTIONS             = 0x1200;
     public static final int INSTALL_EE_COMPONENT                        = 0x1300;
+    public static final int INSTALL_EJB_COMPONENT                       = 0x1350;
     public static final int INSTALL_SERVLET_INIT_DEPLOYMENT             = 0x1400;
     public static final int INSTALL_WAR_DEPLOYMENT                      = 0x1500;
     public static final int INSTALL_ARQUILLIAN_DEPLOYMENT               = 0x1600;
