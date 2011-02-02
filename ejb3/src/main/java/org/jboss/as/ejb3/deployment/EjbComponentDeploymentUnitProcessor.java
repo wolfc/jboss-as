@@ -24,7 +24,7 @@ package org.jboss.as.ejb3.deployment;
 
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ejb3.component.StatelessEJBComponent;
-import org.jboss.as.managedbean.container.ManagedBeanComponentFactory;
+import org.jboss.as.managedbean.component.ManagedBeanComponentFactory;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -119,9 +119,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
     private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
         // TODO: This isn't foolproof yet. Need a better naming
         String ejbComponentName = EJB_COMPONENT_PREFIX + deploymentUnit.getName() + sessionBean.getName();
-        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessEJBComponent.class.getName());
-        // hmm, why set it as an attachment?
-        sessionBeanComponentConfig.putAttachment(org.jboss.as.ee.component.Attachments.COMPONENT_FACTORY, ManagedBeanComponentFactory.INSTANCE);
+        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessEJBComponent.class.getName(), ManagedBeanComponentFactory.INSTANCE);
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);

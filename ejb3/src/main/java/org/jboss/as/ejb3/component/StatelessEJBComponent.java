@@ -23,6 +23,7 @@
 package org.jboss.as.ejb3.component;
 
 import org.jboss.as.ee.component.AbstractComponent;
+import org.jboss.as.ee.component.AbstractComponentInstance;
 import org.jboss.as.ee.component.injection.ResourceInjection;
 import org.jboss.as.ee.component.interceptor.ComponentInterceptorFactories;
 import org.jboss.as.ee.component.lifecycle.ComponentLifecycle;
@@ -63,5 +64,11 @@ public class StatelessEJBComponent extends AbstractComponent {
      */
     public StatelessEJBComponent(final Class<?> beanClass, final ClassLoader beanClassLoader, final List<ResourceInjection> resourceInjections, final List<ComponentLifecycle> postConstrucInterceptors, final List<ComponentLifecycle> preDestroyInterceptors, final ComponentInterceptorFactories methodInterceptorFactories) {
         super(beanClass, beanClassLoader, resourceInjections, postConstrucInterceptors, preDestroyInterceptors, methodInterceptorFactories);
+    }
+
+    @Override
+    protected AbstractComponentInstance createComponentInstance(Object instance) {
+        // TODO: Implement this!
+        return null;
     }
 }
