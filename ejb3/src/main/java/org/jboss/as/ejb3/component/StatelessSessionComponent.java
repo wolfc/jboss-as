@@ -31,6 +31,7 @@ import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.invocation.InterceptorFactory;
 
 import javax.annotation.Resource;
+import javax.annotation.Resources;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ import java.util.Map;
  * <p/>
  * Author : Jaikiran Pai
  */
-public class StatelessEJBComponent extends AbstractComponent {
+public class StatelessSessionComponent extends AbstractComponent {
 
 
     // TODO: Need to use the right "name" for the @Resource
@@ -62,7 +63,7 @@ public class StatelessEJBComponent extends AbstractComponent {
      * @param preDestroyInterceptors     The pre-destroy callbacks for the SLSB
      * @param methodInterceptorFactories
      */
-    public StatelessEJBComponent(final Class<?> beanClass, final ClassLoader beanClassLoader, final List<ResourceInjection> resourceInjections, final List<ComponentLifecycle> postConstrucInterceptors, final List<ComponentLifecycle> preDestroyInterceptors, final ComponentInterceptorFactories methodInterceptorFactories) {
+    public StatelessSessionComponent(final Class<?> beanClass, final ClassLoader beanClassLoader, final List<ResourceInjection> resourceInjections, final List<ComponentLifecycle> postConstrucInterceptors, final List<ComponentLifecycle> preDestroyInterceptors, final ComponentInterceptorFactories methodInterceptorFactories) {
         super(beanClass, beanClassLoader, resourceInjections, postConstrucInterceptors, preDestroyInterceptors, methodInterceptorFactories);
     }
 

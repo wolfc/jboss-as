@@ -23,13 +23,14 @@
 package org.jboss.as.ejb3.deployment;
 
 import org.jboss.as.ee.component.ComponentConfiguration;
-import org.jboss.as.ejb3.component.StatelessEJBComponent;
+import org.jboss.as.ejb3.component.StatelessSessionComponent;
 import org.jboss.as.managedbean.component.ManagedBeanComponentFactory;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.ejb3.effigy.common.JBossBeanEffigyInfo;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.ejb3.effigy.int2.JBossBeanEffigyFactory;
@@ -49,7 +50,7 @@ import org.jboss.modules.Module;
  * <p/>
  * EJB containers are deployed as Java EE Managed Beans (JSR-316). As such the {@link ComponentConfiguration} created
  * in this deployer will be corresponding to managed bean configurations whose bean class is an appropriate EJB component (for
- * example, {@link StatelessEJBComponent})
+ * example, {@link org.jboss.as.ejb3.component.StatelessSessionComponent})
  * <p/>
  * Author: Jaikiran Pai
  */
@@ -101,12 +102,12 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
             // attach a component config for stateless EJB component to deploy it as a Managed Bean
             this.createAndAttachManagedBeanComponentConfig(deploymentUnit, sessionBean);
 
-            // TODO: Once we have jboss.xml processing, this won't be needed and we'll solely work on JBossMetaData
-            // and JBoss*BeanMetaData
-            // now create Effigy for this EJB and make it available in JNDI so that it can be injected
-            // into the StatelessEJBComponent (a.k.a container)
-            JBossSessionBeanEffigy sessionBeanEffigy = this.getJBossSessionBeanEffigy(this.getClassLoader(deploymentUnit), sessionBean);
-            // TODO: Bind it to jndi.
+//            // TODO: Once we have jboss.xml processing, this won't be needed and we'll solely work on JBossMetaData
+//            // and JBoss*BeanMetaData
+//            // now create Effigy for this EJB and make it available in JNDI so that it can be injected
+//            // into the StatelessEJBComponent (a.k.a container)
+//            JBossSessionBeanEffigy sessionBeanEffigy = this.getJBossSessionBeanEffigy(this.getClassLoader(deploymentUnit), sessionBean);
+//            // TODO: Bind it to jndi.
         }
     }
 
@@ -119,7 +120,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
     private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
         // TODO: This isn't foolproof yet. Need a better naming
         String ejbComponentName = EJB_COMPONENT_PREFIX + deploymentUnit.getName() + sessionBean.getName();
-        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessEJBComponent.class.getName(), ManagedBeanComponentFactory.INSTANCE);
+        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessSessionComponent.class.getName(), ManagedBeanComponentFactory.INSTANCE);
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
@@ -143,4 +144,5 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         }
         return module.getClassLoader();
     }
+
 }
