@@ -237,6 +237,9 @@ public enum Phase {
     public static final int DEPENDENCIES_WELD                           = 0xA00;
     public static final int DEPENDENCIES_NAMING                         = 0xB00;
     public static final int DEPENDENCIES_WS                             = 0xC00;
+    // Sets up appropriate module dependencies for EJB deployments
+    public static final int DEPENDENCIES_EJB                            = 0xD00;
+
 
     // CONFIGURE_MODULE
     public static final int CONFIGURE_MODULE_SPEC                       = 0x100;
