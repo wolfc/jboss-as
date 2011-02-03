@@ -55,6 +55,8 @@ public class ResourceInjectionAnnotationParsingProcessor extends AbstractCompone
     /** {@inheritDoc} **/
     protected void processComponentConfig(final DeploymentUnit deploymentUnit, final DeploymentPhaseContext phaseContext, final CompositeIndex index, final ComponentConfiguration componentConfiguration) {
         final ClassInfo classInfo = index.getClassByName(DotName.createSimple(componentConfiguration.getComponentClassName()));
+        // TODO: This isn't completely correct. If the current class info is null
+        // then we'll somehow have to check the super class to see if it has any annotations
         if(classInfo == null) {
             return; // We can't continue without the annotation index info.
         }
