@@ -57,6 +57,8 @@ public class LifecycleAnnotationParsingProcessor extends AbstractComponentConfig
 
     private void processClass(final CompositeIndex index, final ComponentConfiguration componentConfiguration, final DotName className) {
         final ClassInfo classInfo = index.getClassByName(className);
+        // TODO: This isn't completely correct. If the current class info is null
+        // then we'll somehow have to check the super class to see if it has any annotations
         if(classInfo == null) {
             return;
         }
