@@ -24,16 +24,12 @@ package org.jboss.as.ejb3.component.stateless;
 
 import org.jboss.as.ee.component.AbstractComponent;
 import org.jboss.as.ee.component.AbstractComponentInstance;
-import org.jboss.as.ee.component.ComponentInstance;
-import org.jboss.as.ee.component.injection.ResourceInjection;
-import org.jboss.as.ee.component.interceptor.ComponentInterceptorFactories;
-import org.jboss.as.ee.component.lifecycle.ComponentLifecycle;
+import org.jboss.as.ee.component.ComponentConfiguration;
+import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.invocation.Interceptor;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * {@link org.jboss.as.ee.component.Component} responsible for managing EJB3 stateless session beans
@@ -48,65 +44,28 @@ public class StatelessSessionComponent extends AbstractComponent {
     @Resource
     private JBossSessionBeanEffigy sessionBeanEffigy;
 
-    /**
-     * The component level interceptors that will be applied during the invocation
-     * on the bean
-     */
-    private List<Interceptor> componentInterceptors;
-
     // some more injectable resources
     // @Resource
     // private Pool pool;
 
     /**
-     * Constructs a StatelessEJBComponent for a stateless session bean
+     * Construct a new instance.
      *
-     * @param beanClass                  The SLSB bean class
-     * @param beanClassLoader            The classloader
-     * @param resourceInjections         ResourceInjection(s) for the bean
-     * @param postConstrucInterceptors   Post-construct callbacks for the SLSB
-     * @param preDestroyInterceptors     The pre-destroy callbacks for the SLSB
-     * @param methodInterceptorFactories
+     * @param configuration         the component configuration
+     * @param deploymentClassLoader the class loader of the deployment
+     * @param index                 the deployment reflection index
      */
-    public StatelessSessionComponent(final Class<?> beanClass, final ClassLoader beanClassLoader, final List<ResourceInjection> resourceInjections, final List<ComponentLifecycle> postConstrucInterceptors, final List<ComponentLifecycle> preDestroyInterceptors, final ComponentInterceptorFactories methodInterceptorFactories) {
-        this(beanClass, beanClassLoader, resourceInjections, postConstrucInterceptors, preDestroyInterceptors, methodInterceptorFactories, null);
-    }
-
-    /**
-     * Constructs a StatelessEJBComponent for a stateless session bean
-     *
-     * @param beanClass                  The SLSB bean class
-     * @param beanClassLoader            The classloader
-     * @param resourceInjections         ResourceInjection(s) for the bean
-     * @param postConstrucInterceptors   Post-construct callbacks for the SLSB
-     * @param preDestroyInterceptors     The pre-destroy callbacks for the SLSB
-     * @param methodInterceptorFactories
-     * @param componentInterceptors      The component interceptors
-     */
-    public StatelessSessionComponent(final Class<?> beanClass, final ClassLoader beanClassLoader, final List<ResourceInjection> resourceInjections, final List<ComponentLifecycle> postConstrucInterceptors, final List<ComponentLifecycle> preDestroyInterceptors, final ComponentInterceptorFactories methodInterceptorFactories, List<Interceptor> componentInterceptors) {
-        super(beanClass, beanClassLoader, resourceInjections, postConstrucInterceptors, preDestroyInterceptors, methodInterceptorFactories);
-        this.componentInterceptors = componentInterceptors;
+    protected StatelessSessionComponent(final ComponentConfiguration configuration, final ClassLoader deploymentClassLoader, final DeploymentReflectionIndex index) {
+        super(configuration, deploymentClassLoader, index);
     }
 
     @Override
-    protected AbstractComponentInstance createComponentInstance(Object instance) {
+    protected AbstractComponentInstance constructComponentInstance(Object instance) {
         return new StatelessSessionComponentInstance(this, null, instance);
     }
 
     @Override
-    public ComponentInstance getInstance() {
-        // TODO: Use a pool
-        return super.getInstance();
+    public Interceptor createClientInterceptor(Class<?> view) {
+        throw new RuntimeException("NYI: org.jboss.as.ejb3.component.StatelessEJBComponent.createClientInterceptor");
     }
-
-    @Override
-    protected List<Interceptor> getComponentLevelInterceptors() {
-        List<Interceptor> interceptors = super.getComponentLevelInterceptors();
-        if (interceptors == null || interceptors.isEmpty()) {
-            return Collections.unmodifiableList(this.componentInterceptors);
-        }
-        interceptors.addAll(this.componentInterceptors);
-        return interceptors;
-    }
-
 }

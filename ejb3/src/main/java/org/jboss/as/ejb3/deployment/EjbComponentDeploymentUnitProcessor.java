@@ -137,7 +137,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         ServiceName ejbCompServiceName = this.getEjbCompServiceName(deploymentUnit, componentConfiguration.getName());
         componentConfiguration.setCompContextServiceName(ejbCompServiceName);
 
-        componentConfiguration.setBindContextServiceName(ejbCompServiceName);
         componentConfiguration.setEnvContextServiceName(ejbCompServiceName.append("env"));
     }
 
