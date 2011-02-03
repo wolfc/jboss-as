@@ -23,14 +23,16 @@
 package org.jboss.as.ejb3.deployment;
 
 import org.jboss.as.ee.component.ComponentConfiguration;
-import org.jboss.as.ejb3.component.StatelessSessionComponent;
+import org.jboss.as.ee.naming.ContextNames;
+import org.jboss.as.ee.naming.ContextServiceNameBuilder;
+import org.jboss.as.ejb3.component.stateless.StatelessSessionComponent;
+import org.jboss.as.ejb3.component.stateless.StatelessSessionComponentFactory;
 import org.jboss.as.managedbean.component.ManagedBeanComponentFactory;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
-import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.ejb3.effigy.common.JBossBeanEffigyInfo;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.ejb3.effigy.int2.JBossBeanEffigyFactory;
@@ -42,6 +44,7 @@ import org.jboss.metadata.ejb.jboss.JBossSessionBeanMetaData;
 import org.jboss.metadata.ejb.spec.EjbJarMetaData;
 import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
 import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceName;
 
 /**
  * Deployment unit processor which will pick up {@link EjbJarMetaData} attachment(s) from deployment unit
@@ -50,7 +53,7 @@ import org.jboss.modules.Module;
  * <p/>
  * EJB containers are deployed as Java EE Managed Beans (JSR-316). As such the {@link ComponentConfiguration} created
  * in this deployer will be corresponding to managed bean configurations whose bean class is an appropriate EJB component (for
- * example, {@link org.jboss.as.ejb3.component.StatelessSessionComponent})
+ * example, {@link org.jboss.as.ejb3.component.stateless.StatelessSessionComponent})
  * <p/>
  * Author: Jaikiran Pai
  */
@@ -60,12 +63,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
      * Logger
      */
     private static Logger logger = Logger.getLogger(EjbComponentDeploymentUnitProcessor.class);
-
-    /**
-     *
-     */
-    // TODO: Find a better place for this
-    private static final String EJB_COMPONENT_PREFIX = "org.jboss.ejb3:";
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -102,12 +99,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
             // attach a component config for stateless EJB component to deploy it as a Managed Bean
             this.createAndAttachManagedBeanComponentConfig(deploymentUnit, sessionBean);
 
-//            // TODO: Once we have jboss.xml processing, this won't be needed and we'll solely work on JBossMetaData
-//            // and JBoss*BeanMetaData
-//            // now create Effigy for this EJB and make it available in JNDI so that it can be injected
-//            // into the StatelessEJBComponent (a.k.a container)
-//            JBossSessionBeanEffigy sessionBeanEffigy = this.getJBossSessionBeanEffigy(this.getClassLoader(deploymentUnit), sessionBean);
-//            // TODO: Bind it to jndi.
         }
     }
 
@@ -118,9 +109,9 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
 
     private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
-        // TODO: This isn't foolproof yet. Need a better naming
-        String ejbComponentName = EJB_COMPONENT_PREFIX + deploymentUnit.getName() + sessionBean.getName();
-        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(ejbComponentName, StatelessSessionComponent.class.getName(), ManagedBeanComponentFactory.INSTANCE);
+        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
+        // setup the service names on the component config
+        this.setupServiceNames(deploymentUnit, sessionBeanComponentConfig);
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
@@ -137,12 +128,25 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         }
     }
 
-    private ClassLoader getClassLoader(DeploymentUnit deploymentUnit) {
-        Module module = deploymentUnit.getAttachment(Attachments.MODULE);
-        if (module == null) {
-            throw new IllegalStateException("Module not found for deployment unit: " + deploymentUnit);
+    private void setupServiceNames(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration) {
+        componentConfiguration.setAppContextServiceName(ContextServiceNameBuilder.app(deploymentUnit));
+
+        ServiceName moduleContextServiceName = ContextServiceNameBuilder.module(deploymentUnit);
+        componentConfiguration.setModuleContextServiceName(moduleContextServiceName);
+
+        ServiceName ejbCompServiceName = this.getEjbCompServiceName(deploymentUnit, componentConfiguration.getName());
+        componentConfiguration.setCompContextServiceName(ejbCompServiceName);
+
+        componentConfiguration.setBindContextServiceName(ejbCompServiceName);
+        componentConfiguration.setEnvContextServiceName(ejbCompServiceName.append("env"));
+    }
+
+    private ServiceName getEjbCompServiceName(DeploymentUnit deploymentUnit, String ejbName) {
+        DeploymentUnit parent = deploymentUnit.getParent();
+        if (parent == null) {
+            return ContextNames.MODULE_CONTEXT_SERVICE_NAME.append(deploymentUnit.getName()).append(ejbName);
         }
-        return module.getClassLoader();
+        return ContextNames.MODULE_CONTEXT_SERVICE_NAME.append(parent.getName()).append(deploymentUnit.getName()).append(ejbName);
     }
 
 }
