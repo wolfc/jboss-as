@@ -197,7 +197,10 @@ public enum Phase {
     public static final int PARSE_EXTENSION_LIST                        = 0x0300;
     public static final int PARSE_OSGI_BUNDLE_INFO                      = 0x0400;
     public static final int PARSE_OSGI_PROPERTIES                       = 0x0500;
+    // create and attach EJB metadata for EJB deployments
     public static final int PARSE_EJB_DEPLOYMENT                        = 0x0550;
+    // create and attach the ComponentConfiguration for EJBs
+    public static final int PARSE_EJB_COMPONENT_CONFIG                  = 0x0560;
     public static final int PARSE_WEB_DEPLOYMENT                        = 0x0600;
     public static final int PARSE_WEB_DEPLOYMENT_FRAGMENT               = 0x0700;
     public static final int PARSE_JBOSS_WEB_DEPLOYMENT                  = 0x0800;
@@ -264,7 +267,6 @@ public enum Phase {
     public static final int INSTALL_EE_COMPONENT_INTERCEPTORS           = 0x1100;
     public static final int INSTALL_EE_COMPONENT_INJECTIONS             = 0x1200;
     public static final int INSTALL_EE_COMPONENT                        = 0x1300;
-    public static final int INSTALL_EJB_COMPONENT                       = 0x1350;
     public static final int INSTALL_SERVLET_INIT_DEPLOYMENT             = 0x1400;
     public static final int INSTALL_WAR_DEPLOYMENT                      = 0x1500;
     public static final int INSTALL_ARQUILLIAN_DEPLOYMENT               = 0x1600;
