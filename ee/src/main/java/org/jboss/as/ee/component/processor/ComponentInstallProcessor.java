@@ -22,12 +22,6 @@
 
 package org.jboss.as.ee.component.processor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import javax.naming.Context;
-import javax.naming.Reference;
-
-import java.util.List;
 import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentBinding;
 import org.jboss.as.ee.component.ComponentConfiguration;
@@ -44,6 +38,12 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.value.Values;
+
+import javax.naming.Context;
+import javax.naming.Reference;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Deployment processor responsible for converting {@link org.jboss.as.ee.component.ComponentConfiguration} instances into {@link org.jboss.as.ee.component.Component}instances.
@@ -84,7 +84,7 @@ public class ComponentInstallProcessor extends AbstractComponentConfigProcessor 
                 serviceTarget.addService(referenceBinderName, factoryBinder)
                         .addDependency(componentCreateServiceName)
                         .addDependency(componentBinding.getContextServiceName(), Context.class, factoryBinder.getContextInjector())
-                        .setInitialMode(ServiceController.Mode.ON_DEMAND)
+                        .setInitialMode(ServiceController.Mode.ACTIVE)
                         .install();
                 componentBindingDeps.add(referenceBinderName);
             }
