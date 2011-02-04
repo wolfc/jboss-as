@@ -39,10 +39,13 @@ import org.jboss.logging.Logger;
 import org.jboss.metadata.ejb.jboss.JBoss51MetaData;
 import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeanMetaData;
 import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeansMetaData;
+import org.jboss.metadata.ejb.jboss.JBossSessionBean31MetaData;
 import org.jboss.metadata.ejb.jboss.JBossSessionBeanMetaData;
 import org.jboss.metadata.ejb.spec.EjbJarMetaData;
 import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
 import org.jboss.msc.service.ServiceName;
+
+import static java.util.Arrays.asList;
 
 /**
  * Deployment unit processor which will pick up {@link EjbJarMetaData} attachment(s) from deployment unit
@@ -61,6 +64,13 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
      * Logger
      */
     private static Logger logger = Logger.getLogger(EjbComponentDeploymentUnitProcessor.class);
+
+    private static void addLocalViews(EJBComponentConfiguration componentConfiguration, Iterable<String> viewClassNames) {
+        if(viewClassNames == null)
+            return;
+        for(String viewClassName : viewClassNames)
+            componentConfiguration.addViewClassName(viewClassName);
+    }
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -112,6 +122,14 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         this.setupServiceNames(deploymentUnit, sessionBeanComponentConfig);
         // setup the system interceptors
         this.setupSystemComponentInterceptors(sessionBeanComponentConfig);
+
+        addLocalViews(sessionBeanComponentConfig, sessionBean.getBusinessLocals());
+
+        if(sessionBean instanceof JBossSessionBean31MetaData) {
+            JBossSessionBean31MetaData sessionBean31 = (JBossSessionBean31MetaData) sessionBean;
+            if(sessionBean31.isNoInterfaceBean())
+                addLocalViews(sessionBeanComponentConfig, asList(sessionBean.getEjbClass()));
+        }
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
