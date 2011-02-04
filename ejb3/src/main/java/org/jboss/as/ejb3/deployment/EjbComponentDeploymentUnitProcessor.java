@@ -25,10 +25,8 @@ package org.jboss.as.ejb3.deployment;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
-import org.jboss.as.ejb3.component.stateless.StatelessSessionComponent;
+import org.jboss.as.ejb3.component.stateless.DummyComponentInterceptorFactory;
 import org.jboss.as.ejb3.component.stateless.StatelessSessionComponentFactory;
-import org.jboss.as.managedbean.component.ManagedBeanComponentFactory;
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -43,7 +41,6 @@ import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeansMetaData;
 import org.jboss.metadata.ejb.jboss.JBossSessionBeanMetaData;
 import org.jboss.metadata.ejb.spec.EjbJarMetaData;
 import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
-import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -104,7 +101,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
     @Override
     public void undeploy(DeploymentUnit context) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
 
@@ -112,6 +109,8 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
         // setup the service names on the component config
         this.setupServiceNames(deploymentUnit, sessionBeanComponentConfig);
+        // setup the system interceptors
+        this.setupSystemComponentInterceptors(sessionBeanComponentConfig);
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
@@ -148,4 +147,8 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         return ContextNames.MODULE_CONTEXT_SERVICE_NAME.append(parent.getName()).append(deploymentUnit.getName()).append(ejbName);
     }
 
+    private void setupSystemComponentInterceptors(ComponentConfiguration componentConfiguration) {
+        // TODO: Dummy for now. Should be configurable set of system interceptors, later.
+        componentConfiguration.addComponentSystemInterceptorFactory(new DummyComponentInterceptorFactory());
+    }
 }
