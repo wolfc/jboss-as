@@ -35,10 +35,9 @@ public class StatelessSessionComponentInstance extends AbstractComponentInstance
      * Construct a new instance.
      *
      * @param component   the component
-     * @param interceptor the interceptor for all invocations
      * @param instance    the object instance
      */
-    protected StatelessSessionComponentInstance(final AbstractComponent component, final Interceptor interceptor, final Object instance) {
-        super(component, interceptor, instance);
+    protected StatelessSessionComponentInstance(final AbstractComponent component, final Object instance) {
+        super(component, instance);
     }
 }

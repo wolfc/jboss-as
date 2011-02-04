@@ -25,11 +25,14 @@ package org.jboss.as.ejb3.component.stateless;
 import org.jboss.as.ee.component.AbstractComponent;
 import org.jboss.as.ee.component.AbstractComponentInstance;
 import org.jboss.as.ee.component.ComponentConfiguration;
+import org.jboss.as.ee.component.ComponentInstance;
 import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.invocation.Interceptor;
+import org.jboss.invocation.InterceptorContext;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * {@link org.jboss.as.ee.component.Component} responsible for managing EJB3 stateless session beans
@@ -49,23 +52,37 @@ public class StatelessSessionComponent extends AbstractComponent {
     // private Pool pool;
 
     /**
-     * Construct a new instance.
+     * Constructs a StatelessEJBComponent for a stateless session bean
      *
-     * @param configuration         the component configuration
-     * @param deploymentClassLoader the class loader of the deployment
-     * @param index                 the deployment reflection index
+     * @param componentConfiguration
+     * @param deploymentClassLoader
+     * @param index
      */
-    protected StatelessSessionComponent(final ComponentConfiguration configuration, final ClassLoader deploymentClassLoader, final DeploymentReflectionIndex index) {
-        super(configuration, deploymentClassLoader, index);
+    public StatelessSessionComponent(final ComponentConfiguration componentConfiguration, final ClassLoader deploymentClassLoader, final DeploymentReflectionIndex index) {
+        super(componentConfiguration, deploymentClassLoader, index);
     }
 
     @Override
     protected AbstractComponentInstance constructComponentInstance(Object instance) {
-        return new StatelessSessionComponentInstance(this, null, instance);
+        return new StatelessSessionComponentInstance(this, instance);
     }
 
     @Override
-    public Interceptor createClientInterceptor(Class<?> view) {
-        throw new RuntimeException("NYI: org.jboss.as.ejb3.component.StatelessEJBComponent.createClientInterceptor");
+    public Interceptor createClientInterceptor(Class<?> viewClass) {
+        // TODO: Needs to be implemented
+        return new Interceptor() {
+
+            @Override
+            public Object processInvocation(InterceptorContext context) throws Exception {
+                return context.proceed();
+            }
+        };
+    }
+
+    //TODO: This should be getInstance()
+    @Override
+    public ComponentInstance createInstance() {
+        // TODO: Use a pool
+        return super.createInstance();
     }
 }
