@@ -23,9 +23,8 @@
 package org.jboss.as.ejb3.component.stateless;
 
 import org.jboss.invocation.Interceptor;
+import org.jboss.invocation.InterceptorContext;
 import org.jboss.logging.Logger;
-
-import javax.interceptor.InvocationContext;
 
 /**
  * NOTE: This is just a dummy interceptor which will be removed very soon!
@@ -41,7 +40,7 @@ public class DummyComponentInterceptor implements Interceptor {
     private static Logger logger = Logger.getLogger(DummyComponentInterceptor.class);
 
     @Override
-    public Object processInvocation(InvocationContext context) throws Exception {
+    public Object processInvocation(InterceptorContext context) throws Exception {
 
         logger.info(this.getClass().getSimpleName() + " interceptor invoked");
         return context.proceed();

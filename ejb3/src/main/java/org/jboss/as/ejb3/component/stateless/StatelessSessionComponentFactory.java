@@ -27,6 +27,7 @@ import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentFactory;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
 import org.jboss.invocation.Interceptor;
 import org.jboss.modules.Module;
 
@@ -41,8 +42,8 @@ public class StatelessSessionComponentFactory implements ComponentFactory {
     @Override
     public Component createComponent(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration) {
         ClassLoader cl = this.getClassLoader(deploymentUnit);
-        Class<?> ejbClass = this.getEjbClass(componentConfiguration, cl);
-        return new StatelessSessionComponent(ejbClass, cl, null, null, null, null, this.getComponentInterceptors());
+        DeploymentReflectionIndex reflectionIndex = deploymentUnit.getAttachment(Attachments.REFLECTION_INDEX);
+        return new StatelessSessionComponent(componentConfiguration, cl, reflectionIndex);
     }
 
     private ClassLoader getClassLoader(DeploymentUnit deploymentUnit) {
@@ -59,21 +60,5 @@ public class StatelessSessionComponentFactory implements ComponentFactory {
         // just return a dummy component interceptor
         componentInterceptors.add(new DummyComponentInterceptor());
         return componentInterceptors;
-    }
-
-    private Class<?> getEjbClass(ComponentConfiguration componentConfiguration, ClassLoader cl) {
-        Class<?> ejbClass = componentConfiguration.getComponentClass();
-        // hmm, if this is null, then this StatelessSessionComponentFactory is being
-        // used too early? The class gets set during "ClassLoader phase"
-        if (ejbClass == null) {
-            String ejbClassName = componentConfiguration.getComponentClassName();
-            try {
-                ejbClass = cl.loadClass(ejbClassName);
-            } catch (ClassNotFoundException cnfe) {
-                throw new RuntimeException(cnfe);
-            }
-        }
-        return ejbClass;
-
     }
 }
