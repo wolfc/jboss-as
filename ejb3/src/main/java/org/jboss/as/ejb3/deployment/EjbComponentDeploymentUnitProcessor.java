@@ -25,11 +25,9 @@ package org.jboss.as.ejb3.deployment;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
+import org.jboss.as.ejb3.component.EJBComponentConfiguration;
 import org.jboss.as.ejb3.component.stateless.DummyComponentInterceptorFactory;
-import org.jboss.as.ejb3.component.stateless.StatelessSessionComponent;
 import org.jboss.as.ejb3.component.stateless.StatelessSessionComponentFactory;
-import org.jboss.as.managedbean.component.ManagedBeanComponentFactory;
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -44,7 +42,6 @@ import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeansMetaData;
 import org.jboss.metadata.ejb.jboss.JBossSessionBeanMetaData;
 import org.jboss.metadata.ejb.spec.EjbJarMetaData;
 import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
-import org.jboss.modules.Module;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -110,7 +107,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
 
     private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
-        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
+        EJBComponentConfiguration sessionBeanComponentConfig = new EJBComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
         // setup the service names on the component config
         this.setupServiceNames(deploymentUnit, sessionBeanComponentConfig);
         // setup the system interceptors
@@ -131,7 +128,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         }
     }
 
-    private void setupServiceNames(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration) {
+    private void setupServiceNames(DeploymentUnit deploymentUnit, EJBComponentConfiguration componentConfiguration) {
         componentConfiguration.setAppContextServiceName(ContextServiceNameBuilder.app(deploymentUnit));
 
         ServiceName moduleContextServiceName = ContextServiceNameBuilder.module(deploymentUnit);
@@ -140,7 +137,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         ServiceName ejbCompServiceName = this.getEjbCompServiceName(deploymentUnit, componentConfiguration.getName());
         componentConfiguration.setCompContextServiceName(ejbCompServiceName);
 
-        componentConfiguration.setBindContextServiceName(ejbCompServiceName);
         componentConfiguration.setEnvContextServiceName(ejbCompServiceName.append("env"));
     }
 
