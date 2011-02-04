@@ -25,6 +25,7 @@ package org.jboss.as.ejb3.deployment;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
+import org.jboss.as.ejb3.component.EJBComponentConfiguration;
 import org.jboss.as.ejb3.component.stateless.DummyComponentInterceptorFactory;
 import org.jboss.as.ejb3.component.stateless.StatelessSessionComponentFactory;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -106,7 +107,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
 
     private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
-        ComponentConfiguration sessionBeanComponentConfig = new ComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
+        EJBComponentConfiguration sessionBeanComponentConfig = new EJBComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
         // setup the service names on the component config
         this.setupServiceNames(deploymentUnit, sessionBeanComponentConfig);
         // setup the system interceptors
@@ -127,7 +128,7 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
         }
     }
 
-    private void setupServiceNames(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration) {
+    private void setupServiceNames(DeploymentUnit deploymentUnit, EJBComponentConfiguration componentConfiguration) {
         componentConfiguration.setAppContextServiceName(ContextServiceNameBuilder.app(deploymentUnit));
 
         ServiceName moduleContextServiceName = ContextServiceNameBuilder.module(deploymentUnit);
