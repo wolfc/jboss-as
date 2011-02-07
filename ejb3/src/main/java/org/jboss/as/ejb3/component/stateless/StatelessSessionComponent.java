@@ -28,12 +28,8 @@ import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentInstance;
 import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
-import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.invocation.Interceptor;
 import org.jboss.invocation.InterceptorContext;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * {@link org.jboss.as.ee.component.Component} responsible for managing EJB3 stateless session beans
@@ -42,11 +38,6 @@ import java.util.List;
  * Author : Jaikiran Pai
  */
 public class StatelessSessionComponent extends AbstractComponent {
-
-
-    // TODO: Need to use the right "name" for the @Resource
-    @Resource
-    private JBossSessionBeanEffigy sessionBeanEffigy;
 
     // some more injectable resources
     // @Resource
