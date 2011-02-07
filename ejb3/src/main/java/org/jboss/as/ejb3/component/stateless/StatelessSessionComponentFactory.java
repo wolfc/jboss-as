@@ -59,8 +59,8 @@ public class StatelessSessionComponentFactory implements ComponentFactory {
 
     @Override
     public Collection<ComponentBinding> getComponentBindings(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration, ServiceName componentServiceName) {
-//        final NamingContextConfig appNamespaceConfig = deploymentUnit.getAttachment(org.jboss.as.ee.naming.Attachments.APPLICATION_CONTEXT_CONFIG);
-//        final NamingContextConfig moduleNamespaceConfig = deploymentUnit.getAttachment(org.jboss.as.ee.naming.Attachments.MODULE_CONTEXT_CONFIG);
+        final ServiceName appNamespaceName = deploymentUnit.getAttachment(org.jboss.as.ee.naming.Attachments.APPLICATION_CONTEXT_CONFIG);
+        final ServiceName moduleNamespaceName = deploymentUnit.getAttachment(org.jboss.as.ee.naming.Attachments.MODULE_CONTEXT_CONFIG);
 
         // EJB 3.1 FR 4.4.1
 

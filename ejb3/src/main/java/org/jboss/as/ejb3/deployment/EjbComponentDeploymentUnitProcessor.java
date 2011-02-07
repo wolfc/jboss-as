@@ -161,9 +161,9 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
     private ServiceName getEjbCompServiceName(DeploymentUnit deploymentUnit, String ejbName) {
         DeploymentUnit parent = deploymentUnit.getParent();
         if (parent == null) {
-            return ContextNames.MODULE_CONTEXT_SERVICE_NAME.append(deploymentUnit.getName()).append(ejbName);
+            return ContextNames.COMPONENT_CONTEXT_SERVICE_NAME.append(deploymentUnit.getName()).append(ejbName);
         }
-        return ContextNames.MODULE_CONTEXT_SERVICE_NAME.append(parent.getName()).append(deploymentUnit.getName()).append(ejbName);
+        return ContextNames.COMPONENT_CONTEXT_SERVICE_NAME.append(parent.getName()).append(deploymentUnit.getName()).append(ejbName);
     }
 
     private void setupSystemComponentInterceptors(ComponentConfiguration componentConfiguration) {
