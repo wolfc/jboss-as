@@ -26,7 +26,7 @@ import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
 import org.jboss.as.ejb3.component.EJBComponentConfiguration;
-import org.jboss.as.ejb3.component.stateless.DummyComponentInterceptorFactory;
+import org.jboss.as.ejb3.component.stateless.DummyComponentInterceptor;
 import org.jboss.as.ejb3.component.stateless.StatelessSessionComponentFactory;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -35,6 +35,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.ejb3.effigy.common.JBossBeanEffigyInfo;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.ejb3.effigy.int2.JBossBeanEffigyFactory;
+import org.jboss.invocation.ImmediateInterceptorFactory;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.ejb.jboss.JBoss51MetaData;
 import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeanMetaData;
@@ -66,9 +67,9 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
     private static Logger logger = Logger.getLogger(EjbComponentDeploymentUnitProcessor.class);
 
     private static void addLocalViews(EJBComponentConfiguration componentConfiguration, Iterable<String> viewClassNames) {
-        if(viewClassNames == null)
+        if (viewClassNames == null)
             return;
-        for(String viewClassName : viewClassNames)
+        for (String viewClassName : viewClassNames)
             componentConfiguration.addViewClassName(viewClassName);
     }
 
@@ -125,9 +126,9 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
         addLocalViews(sessionBeanComponentConfig, sessionBean.getBusinessLocals());
 
-        if(sessionBean instanceof JBossSessionBean31MetaData) {
+        if (sessionBean instanceof JBossSessionBean31MetaData) {
             JBossSessionBean31MetaData sessionBean31 = (JBossSessionBean31MetaData) sessionBean;
-            if(sessionBean31.isNoInterfaceBean())
+            if (sessionBean31.isNoInterfaceBean())
                 addLocalViews(sessionBeanComponentConfig, asList(sessionBean.getEjbClass()));
         }
 
@@ -168,6 +169,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
     private void setupSystemComponentInterceptors(ComponentConfiguration componentConfiguration) {
         // TODO: Dummy for now. Should be configurable set of system interceptors, later.
-        componentConfiguration.addComponentSystemInterceptorFactory(new DummyComponentInterceptorFactory());
+        componentConfiguration.addComponentSystemInterceptorFactory(new ImmediateInterceptorFactory(new DummyComponentInterceptor()));
     }
 }
