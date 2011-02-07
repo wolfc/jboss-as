@@ -31,6 +31,7 @@ import org.jboss.as.ee.component.processor.LifecycleInstallProcessor;
 import org.jboss.as.ee.component.processor.ResourceInjectionAnnotationParsingProcessor;
 import org.jboss.as.ee.component.processor.ResourceInjectionInstallProcessor;
 import org.jboss.as.ee.naming.ApplicationContextProcessor;
+import org.jboss.as.ee.naming.ComponentContextProcessor;
 import org.jboss.as.ee.naming.ModuleContextProcessor;
 import org.jboss.as.ee.structure.EarMetaDataParsingProcessor;
 import org.jboss.as.ee.structure.EarInitializationProcessor;
@@ -75,6 +76,7 @@ public final class EeSubsystemAdd extends AbstractSubsystemAdd<EeSubsystemElemen
 
         updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_MODULE_CONTEXT, new ModuleContextProcessor());
         updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_APP_CONTEXT, new ApplicationContextProcessor());
+        updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_COMP_CONTEXT, new ComponentContextProcessor());
 
         updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_EE_COMPONENT_CLASSLOAD, new ComponentClassLoadingProcessor());
         updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_EE_COMPONENT_LIFECYCLES, new LifecycleInstallProcessor());

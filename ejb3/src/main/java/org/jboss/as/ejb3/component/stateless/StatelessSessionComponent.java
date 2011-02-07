@@ -87,7 +87,7 @@ public class StatelessSessionComponent extends AbstractComponent {
     }
 
     @Override
-    protected Interceptor createClientInterceptor(Class<?> viewClass) {
+    public Interceptor createClientInterceptor(Class<?> viewClass) {
         // TODO: Needs to be implemented
         return new Interceptor() {
 

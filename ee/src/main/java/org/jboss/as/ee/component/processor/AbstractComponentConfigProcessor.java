@@ -23,6 +23,7 @@
 package org.jboss.as.ee.component.processor;
 
 import java.util.List;
+
 import org.jboss.as.ee.component.Attachments;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -59,7 +60,8 @@ public abstract class AbstractComponentConfigProcessor implements DeploymentUnit
      * @param deploymentUnit         The deployment unit
      * @param phaseContext           The phase context
      * @param componentConfiguration The component configuration
-     * @throws DeploymentUnitProcessingException if any problems occur
+     * @throws DeploymentUnitProcessingException
+     *          if any problems occur
      */
     protected void processComponentConfig(final DeploymentUnit deploymentUnit, final DeploymentPhaseContext phaseContext, final ComponentConfiguration componentConfiguration) throws DeploymentUnitProcessingException {
         final CompositeIndex index = deploymentUnit.getAttachment(org.jboss.as.server.deployment.Attachments.COMPOSITE_ANNOTATION_INDEX);
@@ -77,7 +79,8 @@ public abstract class AbstractComponentConfigProcessor implements DeploymentUnit
      * @param phaseContext           The phase context
      * @param index                  The annotation index
      * @param componentConfiguration The component configuration
-     * @throws DeploymentUnitProcessingException if any problems occur
+     * @throws DeploymentUnitProcessingException
+     *          if any problems occur
      */
     protected void processComponentConfig(final DeploymentUnit deploymentUnit, final DeploymentPhaseContext phaseContext, final CompositeIndex index, final ComponentConfiguration componentConfiguration) throws DeploymentUnitProcessingException {
     }
@@ -86,6 +89,24 @@ public abstract class AbstractComponentConfigProcessor implements DeploymentUnit
     /**
      * {@inheritDoc} *
      */
-    public void undeploy(DeploymentUnit context) {
+    public void undeploy(DeploymentUnit deploymentUnit) {
+        final List<ComponentConfiguration> componentConfigurations = deploymentUnit.getAttachment(Attachments.COMPONENT_CONFIGS);
+        if (componentConfigurations == null || componentConfigurations.isEmpty()) {
+            return;
+        }
+
+        for (ComponentConfiguration componentConfiguration : componentConfigurations) {
+            undeployComponentConfig(deploymentUnit, componentConfiguration);
+        }
+    }
+
+    /**
+     * Process the undeployment of the component
+     *
+     * @param deploymentUnit
+     * @param componentConfiguration
+     */
+    protected void undeployComponentConfig(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration) {
+
     }
 }
