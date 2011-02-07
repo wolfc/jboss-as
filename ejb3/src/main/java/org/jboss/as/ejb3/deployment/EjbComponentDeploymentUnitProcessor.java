@@ -23,6 +23,9 @@
 package org.jboss.as.ejb3.deployment;
 
 import org.jboss.as.ee.component.ComponentConfiguration;
+import org.jboss.as.ee.component.interceptor.MethodInterceptorAllFilter;
+import org.jboss.as.ee.component.interceptor.MethodInterceptorConfiguration;
+import org.jboss.as.ee.component.interceptor.MethodInterceptorFilter;
 import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
 import org.jboss.as.ejb3.component.EJBComponentConfiguration;
@@ -38,12 +41,17 @@ import org.jboss.ejb3.effigy.int2.JBossBeanEffigyFactory;
 import org.jboss.invocation.ImmediateInterceptorFactory;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.ejb.jboss.JBoss51MetaData;
+import org.jboss.metadata.ejb.jboss.JBossAssemblyDescriptorMetaData;
 import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeanMetaData;
 import org.jboss.metadata.ejb.jboss.JBossEnterpriseBeansMetaData;
+import org.jboss.metadata.ejb.jboss.JBossMetaData;
 import org.jboss.metadata.ejb.jboss.JBossSessionBean31MetaData;
 import org.jboss.metadata.ejb.jboss.JBossSessionBeanMetaData;
+import org.jboss.metadata.ejb.spec.AroundInvokeMetaData;
 import org.jboss.metadata.ejb.spec.EjbJarMetaData;
 import org.jboss.metadata.ejb.spec.EnterpriseBeansMetaData;
+import org.jboss.metadata.ejb.spec.InterceptorBindingMetaData;
+import org.jboss.metadata.ejb.spec.InterceptorsMetaData;
 import org.jboss.msc.service.ServiceName;
 
 import static java.util.Arrays.asList;
@@ -65,6 +73,38 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
      * Logger
      */
     private static Logger logger = Logger.getLogger(EjbComponentDeploymentUnitProcessor.class);
+
+    private static void addInterceptors(EJBComponentConfiguration componentConfiguration, JBossSessionBeanMetaData sessionBeanMetaData) {
+        final JBossMetaData metaData = sessionBeanMetaData.getJBossMetaData();
+        final InterceptorsMetaData interceptorsMetaData = metaData.getInterceptors();
+        final JBossAssemblyDescriptorMetaData assemblyDescriptorMetaData = metaData.getAssemblyDescriptor();
+
+        // Default interceptors
+        for(final InterceptorBindingMetaData interceptorBindingMetaData : assemblyDescriptorMetaData.getInterceptorBindings()) {
+            if(!interceptorBindingMetaData.isTotalOrdering() && interceptorBindingMetaData.getEjbName().equals("*")) {
+                for(String interceptorClass : interceptorBindingMetaData.getInterceptorClasses()) {
+                    // TODO: how to handle multiple methods?
+                    final String methodName = interceptorsMetaData.get(interceptorClass).getAroundInvokes().get(0).getMethodName();
+                    // TODO: fixme, choose the proper filter
+                    final MethodInterceptorFilter methodFilter = MethodInterceptorAllFilter.INSTANCE;
+                    componentConfiguration.addClassInterceptorConfig(new MethodInterceptorConfiguration(interceptorClass, methodName, methodFilter));
+                }
+            }
+        }
+
+        // Class interceptors
+        //componentConfiguration.addClassInterceptorConfig();
+
+        // BEan method interceptors
+        if(sessionBeanMetaData.getAroundInvokes() != null) {
+            for(final AroundInvokeMetaData aroundInvokeMetaData : sessionBeanMetaData.getAroundInvokes()) {
+                String className = aroundInvokeMetaData.getClassName();
+                if(className == null)
+                    className = sessionBeanMetaData.getEjbClass();
+                componentConfiguration.addComponentInterceptorConfig(new MethodInterceptorConfiguration(className, aroundInvokeMetaData.getMethodName(), MethodInterceptorAllFilter.INSTANCE));
+            }
+        }
+    }
 
     private static void addLocalViews(EJBComponentConfiguration componentConfiguration, Iterable<String> viewClassNames) {
         if (viewClassNames == null)
@@ -131,6 +171,8 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
             if (sessionBean31.isNoInterfaceBean())
                 addLocalViews(sessionBeanComponentConfig, asList(sessionBean.getEjbClass()));
         }
+
+        addInterceptors(sessionBeanComponentConfig, sessionBean);
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
