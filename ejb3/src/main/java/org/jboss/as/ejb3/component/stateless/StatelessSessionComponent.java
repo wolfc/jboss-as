@@ -28,12 +28,8 @@ import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentInstance;
 import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
-import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.invocation.Interceptor;
 import org.jboss.invocation.InterceptorContext;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * {@link org.jboss.as.ee.component.Component} responsible for managing EJB3 stateless session beans
@@ -42,17 +38,6 @@ import java.util.List;
  * Author : Jaikiran Pai
  */
 public class StatelessSessionComponent extends AbstractComponent {
-
-
-    // TODO: Need to use the right "name" for the @Resource
-    @Resource
-    private JBossSessionBeanEffigy sessionBeanEffigy;
-
-    /**
-     * The component level interceptors that will be applied during the invocation
-     * on the bean
-     */
-    private List<Interceptor> componentInterceptors;
 
     // some more injectable resources
     // @Resource
@@ -66,21 +51,9 @@ public class StatelessSessionComponent extends AbstractComponent {
      * @param index
      */
     public StatelessSessionComponent(final ComponentConfiguration componentConfiguration, final ClassLoader deploymentClassLoader, final DeploymentReflectionIndex index) {
-        this(componentConfiguration, deploymentClassLoader, index, null);
+        super(componentConfiguration, deploymentClassLoader, index);
     }
 
-    /**
-     * Constructs a StatelessEJBComponent for a stateless session bean
-     *
-     * @param componentConfiguration
-     * @param deploymentClassLoader
-     * @param index
-     * @param componentInterceptors
-     */
-    public StatelessSessionComponent(final ComponentConfiguration componentConfiguration, final ClassLoader deploymentClassLoader, final DeploymentReflectionIndex index, List<Interceptor> componentInterceptors) {
-        super(componentConfiguration, deploymentClassLoader, index);
-        this.componentInterceptors = componentInterceptors;
-    }
 
     @Override
     protected AbstractComponentInstance constructComponentInstance(Object instance) {

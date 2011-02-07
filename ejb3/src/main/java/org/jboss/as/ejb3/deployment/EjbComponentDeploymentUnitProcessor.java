@@ -35,9 +35,6 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
-import org.jboss.ejb3.effigy.common.JBossBeanEffigyInfo;
-import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
-import org.jboss.ejb3.effigy.int2.JBossBeanEffigyFactory;
 import org.jboss.invocation.ImmediateInterceptorFactory;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.ejb.jboss.JBoss51MetaData;
@@ -176,17 +173,6 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
         // add this component configuration as an attachment to the deployment unit
         deploymentUnit.addToAttachmentList(org.jboss.as.ee.component.Attachments.COMPONENT_CONFIGS, sessionBeanComponentConfig);
-    }
-
-    private JBossSessionBeanEffigy getJBossSessionBeanEffigy(ClassLoader cl, JBossSessionBeanMetaData sessionBean) throws DeploymentUnitProcessingException {
-        JBossBeanEffigyFactory effigyFactory = new JBossBeanEffigyFactory();
-        JBossBeanEffigyInfo effigyInfo = new JBossBeanEffigyInfo(cl, sessionBean);
-        try {
-            return effigyFactory.create(effigyInfo, JBossSessionBeanEffigy.class);
-        } catch (ClassNotFoundException cnfe) // hmm, why does it have a CNFE in throws clause?
-        {
-            throw new DeploymentUnitProcessingException(cnfe);
-        }
     }
 
     private void setupServiceNames(DeploymentUnit deploymentUnit, EJBComponentConfiguration componentConfiguration) {
