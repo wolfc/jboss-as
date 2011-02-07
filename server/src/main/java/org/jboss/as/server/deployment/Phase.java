@@ -255,6 +255,7 @@ public enum Phase {
     public static final int INSTALL_REFLECTION_INDEX                    = 0x0100;
     public static final int INSTALL_APP_CONTEXT                         = 0x0200;
     public static final int INSTALL_MODULE_CONTEXT                      = 0x0300;
+    public static final int INSTALL_COMP_CONTEXT                        = 0x0350;
     public static final int INSTALL_SERVICE_ACTIVATOR                   = 0x0400;
     public static final int INSTALL_OSGI_DEPLOYMENT                     = 0x0500;
     public static final int INSTALL_WAR_METADATA                        = 0x0600;
