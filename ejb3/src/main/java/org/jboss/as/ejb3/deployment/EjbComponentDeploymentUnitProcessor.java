@@ -29,6 +29,7 @@ import org.jboss.as.ee.component.interceptor.MethodInterceptorFilter;
 import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.ee.naming.ContextServiceNameBuilder;
 import org.jboss.as.ejb3.component.EJBComponentConfiguration;
+import org.jboss.as.ejb3.component.stateful.StatefulSessionComponentConfiguration;
 import org.jboss.as.ejb3.component.stateless.DummyComponentInterceptor;
 import org.jboss.as.ejb3.component.stateless.StatelessSessionComponentFactory;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -138,13 +139,8 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
                 continue;
             }
             JBossSessionBeanMetaData sessionBean = (JBossSessionBeanMetaData) ejb;
-            if (!sessionBean.isStateless()) {
-                logger.warn("Only stateless session EJBs are supported currently. Skipping " + ejb.getName() + " from deployment unit: " + deploymentUnit);
-                continue;
-            }
             // attach a component config for stateless EJB component to deploy it as a Managed Bean
             this.createAndAttachManagedBeanComponentConfig(deploymentUnit, sessionBean);
-
         }
     }
 
@@ -155,11 +151,23 @@ public class EjbComponentDeploymentUnitProcessor implements DeploymentUnitProces
 
 
     private void createAndAttachManagedBeanComponentConfig(DeploymentUnit deploymentUnit, JBossSessionBeanMetaData sessionBean) {
-        EJBComponentConfiguration sessionBeanComponentConfig = new EJBComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
+        EJBComponentConfiguration sessionBeanComponentConfig;
+        switch(sessionBean.getSessionType()) {
+            case Stateless:
+                sessionBeanComponentConfig = new EJBComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass(), new StatelessSessionComponentFactory());
+                // setup the system interceptors
+                this.setupSystemComponentInterceptors(sessionBeanComponentConfig);
+                break;
+            case Stateful:
+                sessionBeanComponentConfig = new StatefulSessionComponentConfiguration(sessionBean.getName(), sessionBean.getEjbClass());
+                break;
+            default:
+                logger.warn("Session type " + sessionBean.getSessionType() + " is not yet supported. Skipping " + sessionBean.getName() + " from deployment unit: " + deploymentUnit);
+                return;
+        }
+
         // setup the service names on the component config
         this.setupServiceNames(deploymentUnit, sessionBeanComponentConfig);
-        // setup the system interceptors
-        this.setupSystemComponentInterceptors(sessionBeanComponentConfig);
 
         addLocalViews(sessionBeanComponentConfig, sessionBean.getBusinessLocals());
 
