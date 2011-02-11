@@ -40,11 +40,9 @@
         <module name="org.jboss.as.domain"/>
         <module name="org.jboss.as.ee"/>
         <module name="org.jboss.as.managed-beans"/>
+        <module name="org.jboss.as.naming"/>
         <module name="org.jboss.as.server"/>
         <module name="org.jboss.common-core"/>
-        <!--
-        <module name="org.jboss.as.naming"/>
-        -->
         <module name="org.jboss.ejb3"/>
         <!-- For Interceptor -->
         <module name="org.jboss.invocation"/>

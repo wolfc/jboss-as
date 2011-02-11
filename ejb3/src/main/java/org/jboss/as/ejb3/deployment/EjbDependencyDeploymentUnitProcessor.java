@@ -48,6 +48,12 @@ public class EjbDependencyDeploymentUnitProcessor implements DeploymentUnitProce
     private static ModuleIdentifier JAVAEE_MODULE_IDENTIFIER = ModuleIdentifier.create("javaee.api");
 
 
+    private static void addModuleDependency(ModuleSpecification moduleSpecification, String moduleName) {
+        final ModuleLoader moduleLoader = Module.getSystemModuleLoader();
+        final ModuleIdentifier moduleIdentifier = ModuleIdentifier.create(moduleName);
+        moduleSpecification.addDependency(new ModuleDependency(moduleLoader, moduleIdentifier, false, false, false));
+    }
+
     /**
      * Adds Java EE module as a dependency to any deployment unit which is a EJB deployment
      *
@@ -70,6 +76,9 @@ public class EjbDependencyDeploymentUnitProcessor implements DeploymentUnitProce
         final ModuleLoader moduleLoader = Module.getSystemModuleLoader();
         final ModuleSpecification moduleSpecification = deploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
         moduleSpecification.addDependency(new ModuleDependency(moduleLoader, JAVAEE_MODULE_IDENTIFIER, false, false, false));
+
+        // TODO: until the spi's are properly modularized
+        addModuleDependency(moduleSpecification, "org.jboss.as.ejb3");
     }
 
     @Override

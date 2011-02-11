@@ -46,7 +46,10 @@ public class StatelessSessionComponentFactory implements ComponentFactory {
     public Component createComponent(DeploymentUnit deploymentUnit, ComponentConfiguration componentConfiguration) {
         ClassLoader cl = this.getClassLoader(deploymentUnit);
         DeploymentReflectionIndex reflectionIndex = deploymentUnit.getAttachment(Attachments.REFLECTION_INDEX);
-        return new StatelessSessionComponent(componentConfiguration, cl, reflectionIndex);
+        // TODO: inject the pool somehow
+        StatelessSessionComponent component = new StatelessSessionComponent(componentConfiguration, cl, reflectionIndex);
+        //component.setPool(pool);
+        return component;
     }
 
     private static ClassLoader getClassLoader(DeploymentUnit deploymentUnit) {

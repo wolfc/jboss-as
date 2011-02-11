@@ -47,16 +47,21 @@ public class DummyComponentInterceptor implements Interceptor {
 
         logger.info(this.getClass().getSimpleName() + " interceptor invoked");
         // get the component being invoked
-        Component component = context.getPrivateData(Component.class);
+        StatelessSessionComponent component = (StatelessSessionComponent) context.getPrivateData(Component.class);
         if (component == null) {
             throw new IllegalStateException("Component not set in InterceptorContext: " + context);
         }
-        // TODO: should be getInstance()
-        ComponentInstance componentInstance = component.createInstance();
+        StatelessSessionComponentInstance componentInstance = component.getPool().get();
         // add it to the interceptor context
         context.putPrivateData(ComponentInstance.class, componentInstance);
-
-        // proceed
-        return context.proceed();
+        try {
+            // proceed
+            return context.proceed();
+        }
+        finally {
+            // TODO: remove instance from invocation
+            // context.removePrivateData(ComponentInstance.class);
+            component.getPool().release(componentInstance);
+        }
     }
 }

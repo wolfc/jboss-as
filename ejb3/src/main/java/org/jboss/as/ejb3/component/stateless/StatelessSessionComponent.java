@@ -26,11 +26,15 @@ import org.jboss.as.ee.component.AbstractComponent;
 import org.jboss.as.ee.component.AbstractComponentInstance;
 import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentConfiguration;
-import org.jboss.as.ee.component.ComponentInstance;
+import org.jboss.as.ejb3.pool.spi.ComponentInstanceFactory;
+import org.jboss.as.ejb3.pool.spi.Pool;
 import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
 import org.jboss.ejb3.effigy.common.JBossSessionBeanEffigy;
 import org.jboss.invocation.Interceptor;
 import org.jboss.invocation.InterceptorContext;
+import org.jboss.logging.Logger;
+
+import javax.naming.NamingException;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -42,6 +46,7 @@ import java.util.List;
  * Author : Jaikiran Pai
  */
 public class StatelessSessionComponent extends AbstractComponent {
+    private static final Logger log = Logger.getLogger(StatelessSessionComponent.class);
 
 
     // TODO: Need to use the right "name" for the @Resource
@@ -56,7 +61,7 @@ public class StatelessSessionComponent extends AbstractComponent {
 
     // some more injectable resources
     // @Resource
-    // private Pool pool;
+    private Pool<StatelessSessionComponentInstance> pool;
 
     /**
      * Constructs a StatelessEJBComponent for a stateless session bean
@@ -102,11 +107,33 @@ public class StatelessSessionComponent extends AbstractComponent {
         };
     }
 
-    //TODO: This should be getInstance()
-    @Override
-    public ComponentInstance createInstance() {
-        // TODO: Use a pool
-        return super.createInstance();
+    public Pool<StatelessSessionComponentInstance> getPool() {
+        if(pool == null) {
+            log.warn("Pool was not injected, doing it myself");
+            try {
+                setPool((Pool<StatelessSessionComponentInstance>) getNamespaceContextSelector().getContext("module").lookup("CustomPool"));
+            } catch (NamingException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            log.warn("Pool was injected, but this legacy code is still alive");
+        }
+        return pool;
     }
 
+    public void setPool(Pool<StatelessSessionComponentInstance> pool) {
+        this.pool = pool;
+        pool.setComponentInstanceFactory(new ComponentInstanceFactory<StatelessSessionComponentInstance>() {
+            @Override
+            public StatelessSessionComponentInstance createInstance() {
+                return (StatelessSessionComponentInstance) StatelessSessionComponent.this.createInstance();
+            }
+
+            @Override
+            public void destroyInstance(StatelessSessionComponentInstance instance) {
+                StatelessSessionComponent.this.destroyInstance(instance);
+            }
+        });
+    }
 }
