@@ -62,7 +62,7 @@ class Ejb3SubsystemAdd implements ModelAddOperationHandler, BootOperationHandler
 
             // add the metadata parser deployment processor
             updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_EJB_DEPLOYMENT, new EjbJarParsingDeploymentUnitProcessor());
-            updateContext.addDeploymentProcessor(Phase.INSTALL, Phase.PARSE_EJB_COMPONENT_CONFIG, new EjbComponentDeploymentUnitProcessor());
+            updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_EJB_COMPONENT_CONFIG, new EjbComponentDeploymentUnitProcessor());
             updateContext.addDeploymentProcessor(Phase.DEPENDENCIES, Phase.DEPENDENCIES_EJB, new EjbDependencyDeploymentUnitProcessor());
 
             // add the real deployment processor
