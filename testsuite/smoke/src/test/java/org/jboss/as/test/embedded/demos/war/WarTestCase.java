@@ -34,10 +34,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Arrays;
 
 /**
  *
@@ -50,8 +47,6 @@ public class WarTestCase {
 
     @Deployment
     public static Archive<?> getDeployment(){
-        System.err.println("URL = " + Thread.currentThread().getContextClassLoader().getResource("META-INF/services/" + DocumentBuilderFactory.class.getName()));
-        System.err.println(Arrays.toString(((URLClassLoader) Thread.currentThread().getContextClassLoader()).getURLs()));
         return ShrinkWrapUtils.createWebArchive("demos/war-example.war", SimpleServlet.class.getPackage());
     }
 
