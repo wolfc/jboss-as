@@ -23,6 +23,7 @@
 package org.jboss.as.ee.naming;
 
 import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.msc.service.ServiceName;
 
 /**
@@ -33,4 +34,6 @@ import org.jboss.msc.service.ServiceName;
 public class Attachments {
     public static final AttachmentKey<ServiceName> APPLICATION_CONTEXT_CONFIG = AttachmentKey.create(ServiceName.class);
     public static final AttachmentKey<ServiceName> MODULE_CONTEXT_CONFIG = AttachmentKey.create(ServiceName.class);
+    // the java:comp configs for each component within a module
+    public static final AttachmentKey<AttachmentList<ServiceName>> COMP_CONTEXT_CONFIGS = AttachmentKey.createList(ServiceName.class);
 }
