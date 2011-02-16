@@ -26,6 +26,7 @@ import org.jboss.as.ee.component.AbstractComponent;
 import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentFactory;
+import org.jboss.as.ee.component.injection.ResourceInjection;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.msc.inject.Injector;
@@ -63,6 +64,28 @@ public final class ComponentCreateService implements Service<Component> {
         this.componentConfiguration = componentConfiguration;
     }
 
+    /**
+     * Mimic AbstractComponent.applyInjections
+     * @param instance the instance to inject
+     */
+    private void applyInjections(final Object instance) {
+        final Iterable<? extends ResourceInjection> resourceInjections = componentConfiguration.getComponentResourceInjections();
+        if(resourceInjections == null)
+            return;
+        for (ResourceInjection resourceInjection : resourceInjections) {
+            resourceInjection.inject(instance);
+        }
+    }
+
+    protected void applyUninjections(final Object instance) {
+        final Iterable<? extends ResourceInjection> resourceInjections = componentConfiguration.getComponentResourceInjections();
+        if (resourceInjections == null)
+            return;
+        for (ResourceInjection resourceInjection : resourceInjections) {
+            resourceInjection.uninject(instance);
+        }
+    }
+
     /** {@inheritDoc} */
     public synchronized void start(final StartContext context) throws StartException {
         final Component component;
@@ -74,9 +97,7 @@ public final class ComponentCreateService implements Service<Component> {
         // TODO: make these contexts part of config...?
         if (component instanceof AbstractComponent) {
             final AbstractComponent abstractComponent = AbstractComponent.class.cast(this.component);
-            abstractComponent.setComponentContext(compContext.getValue());
-            abstractComponent.setModuleContext(moduleContext.getValue());
-            abstractComponent.setApplicationContext(appContext.getValue());
+            applyInjections(abstractComponent);
         }
     }
 
@@ -86,9 +107,7 @@ public final class ComponentCreateService implements Service<Component> {
         this.component = null;
         if(component instanceof AbstractComponent) {
             final AbstractComponent abstractComponent = AbstractComponent.class.cast(component);
-            abstractComponent.setComponentContext(null);
-            abstractComponent.setModuleContext(null);
-            abstractComponent.setApplicationContext(null);
+            applyUninjections(abstractComponent);
         }
     }
 
