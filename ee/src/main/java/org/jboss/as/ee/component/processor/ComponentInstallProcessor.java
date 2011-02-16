@@ -32,6 +32,7 @@ import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentBinding;
 import org.jboss.as.ee.component.ComponentConfiguration;
 import org.jboss.as.ee.component.ComponentFactory;
+import org.jboss.as.ee.component.injection.ComponentResourceInjectionConfiguration;
 import org.jboss.as.ee.component.injection.ResourceInjectionDependency;
 import org.jboss.as.ee.component.service.ComponentCreateService;
 import org.jboss.as.ee.component.service.ComponentStartService;
@@ -52,6 +53,15 @@ import org.jboss.msc.value.Values;
  */
 public class ComponentInstallProcessor extends AbstractComponentConfigProcessor {
 
+    private static void addComponentResourceInjections(ServiceBuilder<?> builder, Iterable<ComponentResourceInjectionConfiguration> componentResourceInjections) {
+        if (componentResourceInjections == null)
+            return;
+
+        for (ComponentResourceInjectionConfiguration injection : componentResourceInjections) {
+            builder.addDependency(injection.getServiceName(), injection.getInjectedType(), injection.getInjector());
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -65,12 +75,10 @@ public class ComponentInstallProcessor extends AbstractComponentConfigProcessor 
         final ServiceName componentStartServiceName  = deploymentUnit.getServiceName().append("component").append(componentConfiguration.getName()).append("START");
 
         ComponentCreateService createService = new ComponentCreateService(componentFactory, componentConfiguration);
-        serviceTarget.addService(componentCreateServiceName, createService)
-            .addDependency(deploymentUnit.getServiceName(), DeploymentUnit.class, createService.getDeploymentUnitInjector())
-            .addDependency(componentConfiguration.getCompContextServiceName(), Context.class, createService.getCompContextInjector())
-            .addDependency(componentConfiguration.getModuleContextServiceName(), Context.class, createService.getModuleContextInjector())
-            .addDependency(componentConfiguration.getAppContextServiceName(), Context.class, createService.getAppContextInjector())
-            .install();
+        ServiceBuilder builder = serviceTarget.addService(componentCreateServiceName, createService)
+            .addDependency(deploymentUnit.getServiceName(), DeploymentUnit.class, createService.getDeploymentUnitInjector());
+        addComponentResourceInjections(builder, componentConfiguration.getComponentResourceInjectionConfigs());
+        builder.install();
 
         // Create required component bindings, each depending on the component create service
 

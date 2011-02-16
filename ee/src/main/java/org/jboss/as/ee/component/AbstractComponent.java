@@ -41,6 +41,7 @@ import org.jboss.invocation.SimpleInterceptorFactoryContext;
 import org.jboss.invocation.proxy.MethodIdentifier;
 import org.jboss.invocation.proxy.ProxyFactory;
 
+import javax.naming.Context;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -64,6 +65,20 @@ import static org.jboss.as.ee.component.SecurityActions.setContextClassLoader;
 public abstract class AbstractComponent implements Component {
 
     static final Object INSTANCE_KEY = new Object();
+
+    static final Method SET_APP_CONTEXT;
+    static final Method SET_COMP_CONTEXT;
+    static final Method SET_MODULE_CONTEXT;
+
+    static {
+        try {
+            SET_APP_CONTEXT = AbstractComponent.class.getMethod("setApplicationContext", Context.class);
+            SET_COMP_CONTEXT = AbstractComponent.class.getMethod("setComponentContext", Context.class);
+            SET_MODULE_CONTEXT = AbstractComponent.class.getMethod("setModuleContext", Context.class);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static final InterceptorInstanceFactory INSTANCE_FACTORY = new InterceptorInstanceFactory() {
         public Object createInstance(final InterceptorFactoryContext context) {

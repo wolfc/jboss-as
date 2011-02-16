@@ -22,22 +22,29 @@
 
 package org.jboss.as.ee.component;
 
+import org.jboss.as.ee.component.injection.ComponentResourceInjectionConfiguration;
+import org.jboss.as.ee.component.injection.MethodResourceInjection;
+import org.jboss.as.ee.component.injection.ResourceInjectableConfiguration;
+import org.jboss.as.ee.component.injection.ResourceInjection;
+import org.jboss.as.ee.component.injection.ResourceInjectionDependency;
+import org.jboss.as.ee.component.interceptor.ComponentInterceptorFactories;
+import org.jboss.as.ee.component.interceptor.MethodInterceptorConfiguration;
+import org.jboss.as.ee.component.lifecycle.ComponentLifecycle;
+import org.jboss.as.ee.component.lifecycle.ComponentLifecycleConfiguration;
+import org.jboss.as.ee.naming.ContextNames;
+import org.jboss.as.naming.deployment.JndiName;
+import org.jboss.invocation.InterceptorFactory;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.value.Values;
+
+import javax.naming.Context;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.jboss.as.ee.component.injection.ResourceInjectableConfiguration;
-import org.jboss.as.ee.component.injection.ResourceInjectionDependency;
-import org.jboss.as.ee.component.interceptor.ComponentInterceptorFactories;
-import org.jboss.as.ee.component.lifecycle.ComponentLifecycle;
-import org.jboss.as.ee.component.lifecycle.ComponentLifecycleConfiguration;
-import org.jboss.as.ee.component.interceptor.MethodInterceptorConfiguration;
-import org.jboss.invocation.InterceptorFactory;
-import org.jboss.as.ee.naming.ContextNames;
-import org.jboss.as.naming.deployment.JndiName;
-import org.jboss.msc.service.ServiceName;
 
 /**
  * The configuration for a {@link Component} use for constructing and installing a component.
@@ -62,10 +69,12 @@ public class ComponentConfiguration extends ResourceInjectableConfiguration {
     private final List<InterceptorFactory> componentSystemInterceptorFactories = new ArrayList<InterceptorFactory>();
 
     private Class<?> componentClass;
+    /**
+     * Allow resource injection on the component itself.
+     */
+    private List<ComponentResourceInjectionConfiguration> componentResourceInjectionConfigs = new ArrayList<ComponentResourceInjectionConfiguration>();
+    private List<ResourceInjection> componentResourceInjections = new ArrayList<ResourceInjection>();
     private ServiceName envContextServiceName;
-    private ServiceName compContextServiceName;
-    private ServiceName moduleContextServiceName;
-    private ServiceName appContextServiceName;
 
     /**
      * Construct a new instance.
@@ -313,43 +322,19 @@ public class ComponentConfiguration extends ResourceInjectableConfiguration {
         return ContextNames.COMPONENT_CONTEXT_NAME;
     }
 
-    /**
-     * The service name for the naming context for this component.
-     *
-     * @return The component naming context
-     */
-    public ServiceName getCompContextServiceName() {
-        return compContextServiceName;
-    }
-
+    @Deprecated
     public void setCompContextServiceName(ServiceName compContextServiceName) {
-        this.compContextServiceName = compContextServiceName;
+        addComponentResourceInjection(compContextServiceName, Context.class, AbstractComponent.SET_COMP_CONTEXT);
     }
 
-    /**
-     * The service name for the module context for this component.
-     *
-     * @return The module context name
-     */
-    public ServiceName getModuleContextServiceName() {
-        return moduleContextServiceName;
-    }
-
+    @Deprecated
     public void setModuleContextServiceName(ServiceName moduleContextServiceName) {
-        this.moduleContextServiceName = moduleContextServiceName;
+        addComponentResourceInjection(moduleContextServiceName, Context.class, AbstractComponent.SET_MODULE_CONTEXT);
     }
 
-    /**
-     * The service name for the app context for this component.
-     *
-     * @return The app context name
-     */
-    public ServiceName getAppContextServiceName() {
-        return appContextServiceName;
-    }
-
+    @Deprecated
     public void setAppContextServiceName(ServiceName appContextServiceName) {
-        this.appContextServiceName = appContextServiceName;
+        addComponentResourceInjection(appContextServiceName, Context.class, AbstractComponent.SET_APP_CONTEXT);
     }
 
     /**
@@ -395,6 +380,20 @@ public class ComponentConfiguration extends ResourceInjectableConfiguration {
         return Collections.unmodifiableList(componentSystemInterceptorFactories);
     }
 
+    protected <T> void addComponentResourceInjection(ServiceName serviceName, Class<T> injectedType, Method setter) {
+        ComponentResourceInjectionConfiguration<T> resourceInjectionConfig = new ComponentResourceInjectionConfiguration(serviceName, injectedType);
+        addComponentResourceInjectionConfig(resourceInjectionConfig);
+        componentResourceInjections.add(new MethodResourceInjection(Values.immediateValue(setter), resourceInjectionConfig.getInjector(), false));
+    }
+
+    /**
+     * Add a component resource injection.
+     * @param resourceInjection the component resource injection
+     */
+    public void addComponentResourceInjectionConfig(ComponentResourceInjectionConfiguration resourceInjection) {
+        componentResourceInjectionConfigs.add(resourceInjection);
+    }
+
     /**
      * Add a system interceptor factory for component-level interceptors.
      *
@@ -402,5 +401,13 @@ public class ComponentConfiguration extends ResourceInjectableConfiguration {
      */
     public void addComponentSystemInterceptorFactory(InterceptorFactory factory) {
         componentSystemInterceptorFactories.add(factory);
+    }
+
+    public Iterable<ComponentResourceInjectionConfiguration> getComponentResourceInjectionConfigs() {
+        return Collections.unmodifiableList(componentResourceInjectionConfigs);
+    }
+
+    public Iterable<ResourceInjection> getComponentResourceInjections() {
+        return Collections.unmodifiableList(componentResourceInjections);
     }
 }
