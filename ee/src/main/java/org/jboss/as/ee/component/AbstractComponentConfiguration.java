@@ -147,14 +147,6 @@ public abstract class AbstractComponentConfiguration {
         return interceptorFactoryMap;
     }
 
-    Interceptor getComponentInterceptor() {
-        return componentInterceptor;
-    }
-
-    void setComponentInterceptor(final Interceptor componentInterceptor) {
-        this.componentInterceptor = componentInterceptor;
-    }
-
     Map<Class<?>,ProxyFactory<?>> getProxyFactories() {
         return proxyFactories;
     }
