@@ -22,9 +22,16 @@
 package org.jboss.as.ejb3.component.stateful;
 
 import org.jboss.as.ee.component.AbstractComponent;
+import org.jboss.as.ee.component.Component;
+import org.jboss.as.ee.component.ComponentInstance;
+import org.jboss.as.ee.component.PerViewMethodInterceptorFactory;
 import org.jboss.as.ejb3.component.EJBComponentDescription;
 import org.jboss.as.ejb3.component.session.SessionBeanComponentConfiguration;
 import org.jboss.invocation.ImmediateInterceptorFactory;
+import org.jboss.invocation.Interceptor;
+import org.jboss.invocation.InterceptorFactoryContext;
+
+import java.lang.reflect.Method;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -35,6 +42,19 @@ public class StatefulSessionComponentConfiguration extends SessionBeanComponentC
         super(description);
 
         addComponentSystemInterceptorFactory(new ImmediateInterceptorFactory(new ComponentInstanceInterceptor()));
+
+        addComponentInstanceSystemInterceptorFactory(new PerViewMethodInterceptorFactory() {
+            @Override
+            protected Interceptor create(Component component, ComponentInstance instance, Method method, InterceptorFactoryContext context) {
+                DummyInstanceInterceptor interceptor = (DummyInstanceInterceptor) context.getContextData().get(DummyInstanceInterceptor.class);
+                if(interceptor == null) {
+                    System.err.println("==================== create a DummyInstanceInterceptor");
+                    interceptor = new DummyInstanceInterceptor();
+                    context.getContextData().put(DummyInstanceInterceptor.class, interceptor);
+                }
+                return interceptor;
+            }
+        });
     }
 
     @Override
