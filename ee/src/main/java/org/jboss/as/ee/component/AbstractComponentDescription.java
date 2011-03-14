@@ -35,6 +35,9 @@ import org.jboss.invocation.SimpleInterceptorInstanceFactory;
 import org.jboss.invocation.proxy.MethodIdentifier;
 import org.jboss.invocation.proxy.ProxyFactory;
 import org.jboss.modules.Module;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.value.InjectedValue;
 
 import javax.interceptor.InvocationContext;
 import java.lang.reflect.Method;
@@ -48,9 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.value.InjectedValue;
 
 /**
  * A description of a generic Java EE component.  The description is pre-classloading so it references everything by name.
@@ -412,6 +412,7 @@ public abstract class AbstractComponentDescription extends AbstractInjectableDes
                     componentMethods.put(MethodIdentifier.getIdentifierForMethod(componentMethod), componentMethod);
                     // assemble the final set of interceptor factories for this method.
                     final List<InterceptorFactory> interceptorFactories = new ArrayList<InterceptorFactory>();
+                    interceptorFactories.addAll(configuration.getComponentInstanceSystemInterceptorFactories());
                     // TODO: default-level interceptors if applicable
                     // TODO: This code should be somewhere else
                     //Now we need to create all our interceptors

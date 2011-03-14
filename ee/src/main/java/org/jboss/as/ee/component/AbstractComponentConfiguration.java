@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,7 @@ public abstract class AbstractComponentConfiguration {
     private final Map<ServiceName, InjectedValue<Object>> dependencyInjections = new HashMap<ServiceName, InjectedValue<Object>>();
     private Class<?> componentClass;
     private Interceptor componentInterceptor;
+    private List<InterceptorFactory> componentInstanceSystemInterceptorFactories = new LinkedList<InterceptorFactory>();
 
     /**
      * Construct a new instance.
@@ -187,4 +189,12 @@ public abstract class AbstractComponentConfiguration {
      * @return the component instance
      */
     public abstract AbstractComponent constructComponent();
+
+    protected void addComponentInstanceSystemInterceptorFactory(InterceptorFactory factory) {
+        componentInstanceSystemInterceptorFactories.add(factory);
+    }
+
+    List<? extends InterceptorFactory> getComponentInstanceSystemInterceptorFactories() {
+        return componentInstanceSystemInterceptorFactories;
+    }
 }
