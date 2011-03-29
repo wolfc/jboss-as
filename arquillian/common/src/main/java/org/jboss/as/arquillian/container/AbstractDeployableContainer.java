@@ -90,7 +90,7 @@ public abstract class AbstractDeployableContainer implements DeployableContainer
     public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException {
         try {
             InputStream input = archive.as(ZipExporter.class).exportZip();
-            DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+            DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan().withRollback();
             builder = builder.add(archive.getName(), input).andDeploy();
             DeploymentPlan plan = builder.build();
             DeploymentAction deployAction = builder.getLastAction();
