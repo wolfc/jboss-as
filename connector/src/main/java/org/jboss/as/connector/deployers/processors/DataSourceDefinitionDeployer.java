@@ -23,9 +23,7 @@
 package org.jboss.as.connector.deployers.processors;
 
 import org.jboss.as.ee.component.AbstractComponentConfigProcessor;
-import org.jboss.as.ee.component.AbstractComponentDescription;
-import org.jboss.as.ee.component.BindingDescription;
-import org.jboss.as.ee.component.InterceptorDescription;
+import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -43,10 +41,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.jboss.as.connector.deployers.processors.DirectDataSourceDescription.*;
+import static org.jboss.as.connector.deployers.processors.DirectDataSourceInjectionSource.*;
 
 /**
- * Deployment processor responsible for analyzing each attached {@link AbstractComponentDescription} instance to configure
+ * Deployment processor responsible for analyzing each attached {@link org.jboss.as.ee.component.ComponentDescription} instance to configure
  * required DataSourceDefinition annotations.
  *
  * @author John Bailey
@@ -58,7 +56,7 @@ public class DataSourceDefinitionDeployer extends AbstractComponentConfigProcess
     private static final DotName DATASOURCE_DEFINITIONS = DotName.createSimple(DataSourceDefinitions.class.getName());
 
     /** {@inheritDoc} **/
-    protected void processComponentConfig(final DeploymentUnit deploymentUnit, final DeploymentPhaseContext phaseContext, final CompositeIndex index, final AbstractComponentDescription description) throws DeploymentUnitProcessingException {
+    protected void processComponentConfig(final DeploymentUnit deploymentUnit, final DeploymentPhaseContext phaseContext, final CompositeIndex index, final ComponentDescription description) throws DeploymentUnitProcessingException {
         final ClassInfo classInfo = index.getClassByName(DotName.createSimple(description.getComponentClassName()));
         if(classInfo == null) {
             return; // We can't continue without the annotation index info.
@@ -106,7 +104,7 @@ public class DataSourceDefinitionDeployer extends AbstractComponentConfigProcess
         }
 
         final String type = classValue.asString();
-        final DirectDataSourceDescription desc = new DirectDataSourceDescription();
+        final DirectDataSourceInjectionSource desc = new DirectDataSourceInjectionSource();
         desc.setClassName(type);
         desc.setDatabaseName(asString(annotation, DATABASE_NAME_PROP));
         desc.setDescription(asString(annotation, DESCRIPTION_PROP));
