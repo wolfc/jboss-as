@@ -1,0 +1,7 @@
+<beans>
+    <!--
+    <interceptors>
+        <class>org.jboss.as.testsuite.integration.ejb.jbas9266.SimpleInterceptor</class>
+    </interceptors>
+    -->
+</beans>
