@@ -37,6 +37,8 @@ import static java.security.AccessController.doPrivileged;
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
 public class JBossStandaloneEJBContainerProvider implements EJBContainerProvider {
+    public static final String JBOSS_EMBEDDED_USER_PKGS = "jboss.embedded.user.pkgs";
+
     @Override
     public EJBContainer createEJBContainer(Map<?, ?> properties) throws EJBException {
         //setSystemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager");
@@ -50,9 +52,14 @@ public class JBossStandaloneEJBContainerProvider implements EJBContainerProvider
         if (jbossHomeDir.isDirectory() == false)
             throw new EJBException("Invalid jboss home directory: " + jbossHomeDir);
 
-        // TODO: how are we going to determine which facilities are on which side of the fence? An user can do everything.
         // TODO: normally we would not have org.jboss.logmanager on this side of the fence
-        final StandaloneServer server = EmbeddedServerFactory.create(jbossHomeDir, System.getProperties(), System.getenv(), "org.jboss.logmanager");
+        StringBuffer packages = new StringBuffer("org.jboss.logmanager");
+        // TODO: how are we going to determine which facilities are on which side of the fence? An user can do everything.
+        final String userPackages = property(properties, JBOSS_EMBEDDED_USER_PKGS);
+        if (userPackages != null) {
+            packages.append("," + userPackages);
+        }
+        final StandaloneServer server = EmbeddedServerFactory.create(jbossHomeDir, System.getProperties(), System.getenv(), packages.toString());
         try {
             server.start();
             final JBossStandaloneEJBContainer container = new JBossStandaloneEJBContainer(server);
@@ -73,6 +80,10 @@ public class JBossStandaloneEJBContainerProvider implements EJBContainerProvider
         catch (Exception e) {
             throw new EJBException(e);
         }
+    }
+
+    private static String property(final Map<?, ?> properties, final String key) {
+        return System.getProperty(key, properties == null ? null : (String) properties.get(key));
     }
 
     private static String setSystemProperty(final String key, final String value) {

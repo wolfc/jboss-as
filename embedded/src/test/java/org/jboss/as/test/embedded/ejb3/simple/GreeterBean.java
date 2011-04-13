@@ -19,7 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.embedded.ejb3.simple;
+package org.jboss.as.test.embedded.ejb3.simple;
 
 import javax.ejb.Stateless;
 
