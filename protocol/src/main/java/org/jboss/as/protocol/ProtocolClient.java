@@ -23,6 +23,7 @@
 package org.jboss.as.protocol;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.Executor;
@@ -84,7 +85,13 @@ public final class ProtocolClient {
         }
         if (bindAddress != null) socket.bind(bindAddress);
         if (readTimeout != 0) socket.setSoTimeout(readTimeout);
-        socket.connect(serverAddress, connectTimeout);
+        try {
+            socket.connect(serverAddress, connectTimeout);
+        } catch (ConnectException e) {
+            ConnectException next = new ConnectException(e.getMessage() + " to " + serverAddress);
+            next.initCause(e);
+            throw next;
+        }
         thread.setName("Read thread for " + serverAddress);
         thread.start();
         log.tracef("Connected to %s", serverAddress);
