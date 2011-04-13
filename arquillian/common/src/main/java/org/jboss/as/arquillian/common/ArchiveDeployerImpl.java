@@ -29,6 +29,9 @@ import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentPlanRes
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.jboss.as.protocol.StreamUtils.safeClose;
+
 /**
  * A JBossAS archive deployer
  *
@@ -46,12 +49,16 @@ public final class ArchiveDeployerImpl implements ArchiveDeployer {
     @Override
     public String deploy(Archive<?> archive) throws Exception {
         InputStream input = archive.as(ZipExporter.class).exportZip();
-        DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
-        builder = builder.add(archive.getName(), input).andDeploy();
-        DeploymentPlan plan = builder.build();
-        DeploymentAction deployAction = builder.getLastAction();
-        String runtimeName = executeDeploymentPlan(plan, deployAction);
-        return runtimeName;
+        try {
+            DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan();
+            builder = builder.add(archive.getName(), input).andDeploy();
+            DeploymentPlan plan = builder.build();
+            DeploymentAction deployAction = builder.getLastAction();
+            String runtimeName = executeDeploymentPlan(plan, deployAction);
+            return runtimeName;
+        } finally {
+            safeClose(input);
+        }
     }
 
     @Override
@@ -64,7 +71,7 @@ public final class ArchiveDeployerImpl implements ArchiveDeployer {
 
     private String executeDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction) throws Exception {
         Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
-        ServerDeploymentPlanResult planResult = future.get();
+        ServerDeploymentPlanResult planResult = future.get(30, SECONDS);
 
         ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
         if (actionResult != null) {

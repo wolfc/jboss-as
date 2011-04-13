@@ -50,6 +50,9 @@ import org.jboss.osgi.jmx.MBeanProxy;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.jboss.as.protocol.StreamUtils.safeClose;
+
 /**
  * A JBossAS server connector
  *
@@ -91,13 +94,17 @@ public abstract class AbstractDeployableContainer implements DeployableContainer
     public ContainerMethodExecutor deploy(Context context, Archive<?> archive) throws DeploymentException {
         try {
             InputStream input = archive.as(ZipExporter.class).exportZip();
-            DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan().withRollback();
-            builder = builder.add(archive.getName(), input).andDeploy();
-            DeploymentPlan plan = builder.build();
-            DeploymentAction deployAction = builder.getLastAction();
-            executeDeploymentPlan(plan, deployAction,archive);
+            try {
+                DeploymentPlanBuilder builder = deploymentManager.newDeploymentPlan().withRollback();
+                builder = builder.add(archive.getName(), input).andDeploy();
+                DeploymentPlan plan = builder.build();
+                DeploymentAction deployAction = builder.getLastAction();
+                executeDeploymentPlan(plan, deployAction,archive);
 
-            return getContainerMethodExecutor(context);
+                return getContainerMethodExecutor(context);
+            } finally {
+                safeClose(input);
+            }
         } catch (Exception e) {
             throw new DeploymentException("Could not deploy to container", e);
         }
@@ -177,7 +184,7 @@ public abstract class AbstractDeployableContainer implements DeployableContainer
     private String executeDeploymentPlan(DeploymentPlan plan, DeploymentAction deployAction, Archive<?> archive) throws Exception {
         Future<ServerDeploymentPlanResult> future = deploymentManager.execute(plan);
         registry.put(archive, deployAction.getDeploymentUnitUniqueName());
-        ServerDeploymentPlanResult planResult = future.get();
+        ServerDeploymentPlanResult planResult = future.get(30, SECONDS);
 
         ServerDeploymentActionResult actionResult = planResult.getDeploymentActionResult(deployAction.getId());
         if (actionResult != null) {
