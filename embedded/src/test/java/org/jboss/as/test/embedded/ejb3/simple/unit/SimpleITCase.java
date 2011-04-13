@@ -19,28 +19,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.embedded.ejb3.simple.unit;
+package org.jboss.as.test.embedded.ejb3.simple.unit;
 
-import org.jboss.as.embedded.ejb3.simple.GreeterBean;
+import org.jboss.as.embedded.ejb3.JBossStandaloneEJBContainerProvider;
+import org.jboss.as.test.embedded.ejb3.simple.GreeterBean;
 import org.junit.Test;
 
 import javax.ejb.embeddable.EJBContainer;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Note that the org.jboss.as.embedded package belongs to the system packages, so this test must be outside of
+ * that package.
+ *
+ * @see org.jboss.as.embedded.InitialModuleLoaderFactory#getModuleLoader(java.io.File, String...)
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
 public class SimpleITCase {
     @Test
     public void test1() throws Exception {
-        EJBContainer container = EJBContainer.createEJBContainer();
+        // TODO: this is a temporary work-around until we can resolve the TCCL class loading issue
+        final Properties properties = new Properties();
+        properties.put(JBossStandaloneEJBContainerProvider.JBOSS_EMBEDDED_USER_PKGS, GreeterBean.class.getPackage().getName());
 
-        GreeterBean view = (GreeterBean) container.getContext().lookup("java:global/test-classes/GreeterBean");
-        String name = "μετεμψύχωσις";
-        String result = view.sayHi(name);
-        assertEquals("Hi μετεμψύχωσις", result);
-
-        container.close();
+        EJBContainer container = EJBContainer.createEJBContainer(properties);
+        try {
+            GreeterBean view = (GreeterBean) container.getContext().lookup("java:global/test-classes/GreeterBean");
+            String name = "μετεμψύχωσις";
+            String result = view.sayHi(name);
+            assertEquals("Hi μετεμψύχωσις", result);
+        } finally {
+            container.close();
+        }
     }
 }
