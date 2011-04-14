@@ -19,21 +19,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.as.test.embedded.ejb3.simple;
+package org.jboss.as.embedded.ejb3;
 
-import javax.annotation.Resource;
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
+import org.jboss.modules.DependencySpec;
+import org.jboss.modules.LocalModuleLoader;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.modules.ModuleSpec;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
  */
-@Stateless
-public class GreeterBean {
-    @Resource
-    private SessionContext context;
+public class EmbeddedModuleLoader extends LocalModuleLoader {
+    @Override
+    protected ModuleSpec.Builder createModuleSpecBuilder(ModuleIdentifier moduleIdentifier) {
+        ModuleSpec.Builder builder = super.createModuleSpecBuilder(moduleIdentifier);
+        builder.addDependency(DependencySpec.createModuleDependencySpec(ModuleIdentifier.SYSTEM));
+        return builder;
+    }
 
-    public String sayHi(final String name) {
-        return "Hi " + name;
+    @Override
+    public String toString() {
+        return "Embedded Module Loader";
     }
 }

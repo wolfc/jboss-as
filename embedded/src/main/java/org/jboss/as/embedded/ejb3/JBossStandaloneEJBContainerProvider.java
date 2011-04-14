@@ -28,10 +28,7 @@ import javax.ejb.EJBException;
 import javax.ejb.embeddable.EJBContainer;
 import javax.ejb.spi.EJBContainerProvider;
 import java.io.File;
-import java.security.PrivilegedAction;
 import java.util.Map;
-
-import static java.security.AccessController.doPrivileged;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -41,8 +38,6 @@ public class JBossStandaloneEJBContainerProvider implements EJBContainerProvider
 
     @Override
     public EJBContainer createEJBContainer(Map<?, ?> properties) throws EJBException {
-        //setSystemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager");
-
         String jbossHomeKey = "jboss.home";
         String jbossHomeProp = System.getProperty(jbossHomeKey);
         if (jbossHomeProp == null)
@@ -51,6 +46,10 @@ public class JBossStandaloneEJBContainerProvider implements EJBContainerProvider
         File jbossHomeDir = new File(jbossHomeProp);
         if (jbossHomeDir.isDirectory() == false)
             throw new EJBException("Invalid jboss home directory: " + jbossHomeDir);
+
+        // make sure we always have the app cl as a dependency
+        // see DefaultBootModuleLoaderHolder
+        System.setProperty("boot.module.loader", EmbeddedModuleLoader.class.getName());
 
         // TODO: normally we would not have org.jboss.logmanager on this side of the fence
         StringBuffer packages = new StringBuffer("org.jboss.logmanager");
@@ -84,16 +83,5 @@ public class JBossStandaloneEJBContainerProvider implements EJBContainerProvider
 
     private static String property(final Map<?, ?> properties, final String key) {
         return System.getProperty(key, properties == null ? null : (String) properties.get(key));
-    }
-
-    private static String setSystemProperty(final String key, final String value) {
-        if (System.getSecurityManager() == null)
-            return System.setProperty(key, value);
-        return doPrivileged(new PrivilegedAction<String>() {
-            @Override
-            public String run() {
-                return System.setProperty(key, value);
-            }
-        });
     }
 }
