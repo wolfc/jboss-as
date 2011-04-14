@@ -21,12 +21,10 @@
  */
 package org.jboss.as.test.embedded.ejb3.simple.unit;
 
-import org.jboss.as.embedded.ejb3.JBossStandaloneEJBContainerProvider;
 import org.jboss.as.test.embedded.ejb3.simple.GreeterBean;
 import org.junit.Test;
 
 import javax.ejb.embeddable.EJBContainer;
-import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
@@ -40,11 +38,7 @@ import static org.junit.Assert.assertEquals;
 public class SimpleITCase {
     @Test
     public void test1() throws Exception {
-        // TODO: this is a temporary work-around until we can resolve the TCCL class loading issue
-        final Properties properties = new Properties();
-        properties.put(JBossStandaloneEJBContainerProvider.JBOSS_EMBEDDED_USER_PKGS, GreeterBean.class.getPackage().getName());
-
-        EJBContainer container = EJBContainer.createEJBContainer(properties);
+        EJBContainer container = EJBContainer.createEJBContainer();
         try {
             GreeterBean view = (GreeterBean) container.getContext().lookup("java:global/test-classes/GreeterBean");
             String name = "μετεμψύχωσις";

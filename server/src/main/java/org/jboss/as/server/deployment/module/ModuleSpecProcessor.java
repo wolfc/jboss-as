@@ -22,10 +22,6 @@
 
 package org.jboss.as.server.deployment.module;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -42,10 +38,14 @@ import org.jboss.modules.ResourceLoaderSpec;
 import org.jboss.modules.filter.MultiplePathFilterBuilder;
 import org.jboss.modules.filter.PathFilter;
 import org.jboss.modules.filter.PathFilters;
+import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ValueService;
-import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.value.ImmediateValue;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Processor responsible for creating the module spec service for this deployment. Once the module spec service is created the
@@ -176,6 +176,8 @@ public class ModuleSpecProcessor implements DeploymentUnitProcessor {
                             .moduleSpecServiceName(dependency.getIdentifier()));
                 }
             }
+        // why the hack not? :-)
+        specBuilder.addDependency(DependencySpec.createModuleDependencySpec(ModuleIdentifier.SYSTEM));
         if (!childFirst) {
             specBuilder.addDependency(DependencySpec.createLocalDependencySpec());
         }
