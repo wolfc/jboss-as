@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.0" name="org.jboss.as.test.surefire.servermodule.ServerInModuleStartupTestCase">
+    <resources>
+        <!-- a trick to add the original class path entry -->
+        <resource-root path="../../../../../../../../.."/>
+    </resources>
+
+    <dependencies>
+        <!-- Needed to connect via the client -->
+       <module name="org.jboss.as.controller-client"/>
+       <module name="org.jboss.as.protocol"/>
+       <module name="org.jboss.dmr"/>
+
+        <!-- Needed for JMX -->
+        <module name="javax.api"/>
+
+        <module name="junit"/>
+
+        <!-- also exposes org.jboss.msc -->
+        <module name="org.jboss.as.server"/>
+
+        <module name="org.jboss.logging"/>
+        <!-- note, we load LogManager from system, but we're depending on handlers & formatters -->
+        <module name="org.jboss.logmanager"/>
+        <module name="org.jboss.modules"/>
+        
+        <!-- Needed for shrinkwrap -->
+        <module name="org.jboss.shrinkwrap.api" export="true"/>
+        <module services="export" name="org.jboss.shrinkwrap.impl" export="true"/>
+
+        <module name="org.jboss.threads"/>
+    </dependencies>
+</module>
