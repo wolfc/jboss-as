@@ -125,9 +125,14 @@ public class EmbeddedStandAloneServerFactory {
         return standaloneServer;
     }
 
+    private static <T> T mandatory(T value, String errorMessage) {
+        if (value == null)
+            throw new IllegalStateException(errorMessage);
+        return value;
+    }
 
     public static void setupCleanDirectories(Properties props) {
-        File jbossHomeDir = new File(props.getProperty(ServerEnvironment.HOME_DIR));
+        File jbossHomeDir = new File(mandatory(props.getProperty(ServerEnvironment.HOME_DIR), "Property " + ServerEnvironment.HOME_DIR + " not set"));
         setupCleanDirectories(jbossHomeDir, props);
     }
 

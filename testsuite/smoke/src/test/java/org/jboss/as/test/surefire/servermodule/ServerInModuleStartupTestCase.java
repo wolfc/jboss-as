@@ -21,18 +21,20 @@
  */
 package org.jboss.as.test.surefire.servermodule;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
-
-import java.net.InetAddress;
-
 import junit.framework.Assert;
-
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.client.OperationBuilder;
 import org.jboss.as.protocol.StreamUtils;
 import org.jboss.dmr.ModelNode;
+import org.jboss.modules.junit.ModuleName;
+import org.jboss.modules.junit.Modules;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.net.InetAddress;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
 
 /**
  * Here to prove the forked surefire plugin is capable of running
@@ -41,6 +43,8 @@ import org.junit.Test;
  *
  * @author <a href="kabir.khan@jboss.com">Kabir Khan</a>
  */
+@RunWith(Modules.class)
+@ModuleName("org.jboss.as.test.surefire.servermodule")
 public class ServerInModuleStartupTestCase extends AbstractServerInModuleTestCase {
 
     /**

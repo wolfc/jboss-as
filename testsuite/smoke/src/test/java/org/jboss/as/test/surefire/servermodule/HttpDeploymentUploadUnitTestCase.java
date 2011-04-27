@@ -24,9 +24,12 @@ package org.jboss.as.test.surefire.servermodule;
 import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
 import org.jboss.as.test.surefire.servermodule.archive.sar.Simple;
 import org.jboss.dmr.ModelNode;
+import org.jboss.modules.junit.ModuleName;
+import org.jboss.modules.junit.Modules;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -50,6 +53,8 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUC
  *
  * @author Jonathan Pearlin
  */
+@RunWith(Modules.class)
+@ModuleName("org.jboss.as.test.surefire.servermodule")
 public class HttpDeploymentUploadUnitTestCase extends AbstractServerInModuleTestCase {
 
     private static final String BOUNDARY_PARAM = "NeAG1QNIHHOyB5joAS7Rox!!";
