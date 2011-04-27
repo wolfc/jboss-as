@@ -26,6 +26,7 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.client.OperationBuilder;
 import org.jboss.as.protocol.StreamUtils;
 import org.jboss.dmr.ModelNode;
+import org.jboss.modules.junit.ModuleName;
 import org.jboss.modules.junit.Modules;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUC
  * @author <a href="kabir.khan@jboss.com">Kabir Khan</a>
  */
 @RunWith(Modules.class)
+@ModuleName("org.jboss.as.test.surefire.servermodule")
 public class ServerInModuleStartupTestCase extends AbstractServerInModuleTestCase {
 
     /**

@@ -21,10 +21,29 @@
  */
 package org.jboss.as.test.surefire.servermodule;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import junit.framework.Assert;
+import org.jboss.as.controller.client.ModelControllerClient;
+import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentManager;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.protocol.StreamUtils;
+import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
+import org.jboss.as.test.surefire.servermodule.archive.sar.Simple;
+import org.jboss.dmr.ModelNode;
+import org.jboss.modules.junit.ModuleName;
+import org.jboss.modules.junit.Modules;
+import org.jboss.shrinkwrap.api.exporter.ExplodedExporter;
+import org.jboss.shrinkwrap.api.exporter.ZipExporter;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerDelegate;
+import javax.management.MBeanServerNotification;
+import javax.management.Notification;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -41,33 +60,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerDelegate;
-import javax.management.MBeanServerNotification;
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import javax.management.ObjectName;
-
-import junit.framework.Assert;
-
-import org.jboss.as.controller.client.ModelControllerClient;
-import org.jboss.as.controller.client.helpers.standalone.ServerDeploymentManager;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
-import org.jboss.as.protocol.StreamUtils;
-import org.jboss.as.test.modular.utils.ShrinkWrapUtils;
-import org.jboss.as.test.surefire.servermodule.archive.sar.Simple;
-import org.jboss.dmr.ModelNode;
-import org.jboss.shrinkwrap.api.exporter.ExplodedExporter;
-import org.jboss.shrinkwrap.api.exporter.ZipExporter;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
 /**
  * Tests deployment to a standalone server, both via the client API and by the filesystem scanner.
  *
  * @author Brian Stansberry (c) 2011 Red Hat Inc.
  */
+@RunWith(Modules.class)
+@ModuleName("org.jboss.as.test.surefire.servermodule")
 public class ServerInModuleDeploymentTestCase extends AbstractServerInModuleTestCase {
 
 

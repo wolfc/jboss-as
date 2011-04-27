@@ -20,10 +20,10 @@
   ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
-<module xmlns="urn:jboss:module:1.0" name="org.jboss.as.test.surefire.servermodule.HttpDeploymentUploadUnitTestCase">
+<module xmlns="urn:jboss:module:1.0" name="org.jboss.as.test.surefire.servermodule">
     <resources>
         <!-- a trick to add the original class path entry -->
-        <resource-root path="../../../../../../../../.."/>
+        <resource-root path="../../../../../../../.."/>
     </resources>
 
     <dependencies>
