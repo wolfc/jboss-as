@@ -22,13 +22,12 @@
 
 package org.jboss.as.jpa.hibernate;
 
-import org.jboss.as.ee.naming.ContextNames;
 import org.jboss.as.jpa.config.PersistenceUnitMetadata;
 import org.jboss.as.jpa.spi.PersistenceProviderAdaptor;
+import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.naming.deployment.JndiName;
 import org.jboss.msc.service.ServiceName;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
