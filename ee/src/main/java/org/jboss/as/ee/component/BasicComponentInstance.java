@@ -138,6 +138,8 @@ public class BasicComponentInstance implements ComponentInstance {
         // Interceptor factory context
         final SimpleInterceptorFactoryContext context = new SimpleInterceptorFactoryContext();
         context.getContextData().put(Component.class, component);
+        // For ComponentInstanceInterceptorFactories
+        context.getContextData().put(ComponentInstance.class, this);
 
         // Create the post-construct interceptors for the component instance
         final Interceptor postConstruct = component.getPostConstruct().create(context);
