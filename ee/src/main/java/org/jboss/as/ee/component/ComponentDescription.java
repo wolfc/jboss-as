@@ -535,21 +535,22 @@ public class ComponentDescription {
             new ClassDescriptionTraversal(componentClassConfiguration, moduleConfiguration) {
                 @Override
                 public void handle(EEModuleClassConfiguration configuration, EEModuleClassDescription classDescription) throws DeploymentUnitProcessingException {
+                    final ClassReflectionIndex classReflectionIndex = deploymentReflectionIndex.getClassIndex(configuration.getModuleClass());
                     final MethodIdentifier componentPostConstructMethodIdentifier = classDescription.getPostConstructMethod();
                     if (componentPostConstructMethodIdentifier != null) {
-                        final Method method = ClassReflectionIndexUtil.findRequiredMethod(deploymentReflectionIndex, componentClassIndex, componentPostConstructMethodIdentifier);
+                        final Method method = ClassReflectionIndexUtil.findRequiredMethod(deploymentReflectionIndex, classReflectionIndex, componentPostConstructMethodIdentifier);
                         InterceptorFactory interceptorFactory = new ManagedReferenceLifecycleMethodInterceptorFactory(instanceKey, method, true);
                         userPostConstruct.addLast(interceptorFactory);
                     }
                     final MethodIdentifier componentPreDestroyMethodIdentifier = classDescription.getPreDestroyMethod();
                     if (componentPreDestroyMethodIdentifier != null) {
-                        final Method method = ClassReflectionIndexUtil.findRequiredMethod(deploymentReflectionIndex, componentClassIndex, componentPreDestroyMethodIdentifier);
+                        final Method method = ClassReflectionIndexUtil.findRequiredMethod(deploymentReflectionIndex, classReflectionIndex, componentPreDestroyMethodIdentifier);
                         InterceptorFactory interceptorFactory = new ManagedReferenceLifecycleMethodInterceptorFactory(instanceKey, method, true);
                         userPreDestroy.addLast(interceptorFactory);
                     }
                     final MethodIdentifier componentAroundInvokeMethodIdentifier = classDescription.getAroundInvokeMethod();
                     if (componentAroundInvokeMethodIdentifier != null) {
-                        final Method method = ClassReflectionIndexUtil.findRequiredMethod(deploymentReflectionIndex, componentClassIndex, componentAroundInvokeMethodIdentifier);
+                        final Method method = ClassReflectionIndexUtil.findRequiredMethod(deploymentReflectionIndex, classReflectionIndex, componentAroundInvokeMethodIdentifier);
                         componentUserAroundInvoke.add(new ManagedReferenceLifecycleMethodInterceptorFactory(instanceKey, method, false));
                     }
                 }
