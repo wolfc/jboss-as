@@ -25,6 +25,10 @@ package org.jboss.as.ejb3.component.stateful;
 
 import org.jboss.as.ee.component.Component;
 import org.jboss.as.ee.component.ComponentConfiguration;
+import org.jboss.as.ee.component.ComponentConfigurator;
+import org.jboss.as.ee.component.ComponentDescription;
+import org.jboss.as.ee.component.ComponentInstance;
+import org.jboss.as.ee.component.ComponentInstanceInterceptorFactory;
 import org.jboss.as.ee.component.ComponentInterceptorFactory;
 import org.jboss.as.ee.component.EEModuleConfiguration;
 import org.jboss.as.ee.component.ViewConfiguration;
@@ -98,6 +102,25 @@ public class StatefulComponentDescription extends SessionBeanComponentDescriptio
     public StatefulComponentDescription(final String componentName, final String componentClassName, final EjbJarDescription ejbJarDescription,
                                         final ServiceName deploymentUnitServiceName) {
         super(componentName, componentClassName, ejbJarDescription, deploymentUnitServiceName);
+
+        addStatefulSessionSynchronizationInterceptor();
+    }
+
+    private void addStatefulSessionSynchronizationInterceptor() {
+        getConfigurators().add(new ComponentConfigurator() {
+            @Override
+            public void configure(DeploymentPhaseContext context, ComponentDescription description, ComponentConfiguration configuration) throws DeploymentUnitProcessingException {
+                final InterceptorFactory interceptorFactory = new ComponentInstanceInterceptorFactory() {
+                    @Override
+                    protected Interceptor create(ComponentInstance instance, InterceptorFactoryContext context) {
+                        return new StatefulSessionSynchronizationInterceptor();
+                    }
+                };
+                for (final Method method : configuration.getDefinedComponentMethods()) {
+                    configuration.getComponentInterceptorDeque(method).add(interceptorFactory);
+                }
+            }
+        });
     }
 
     @Override
