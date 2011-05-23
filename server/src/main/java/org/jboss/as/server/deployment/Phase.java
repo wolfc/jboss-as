@@ -250,12 +250,11 @@ public enum Phase {
     public static final int PARSE_JAXRS_ANNOTATIONS                     = 0x2A00;
     public static final int PARSE_WELD_DEPLOYMENT                       = 0x2B00;
     public static final int PARSE_WELD_WEB_INTEGRATION                  = 0x2B10;
-    public static final int PARSE_WELD_COMPONENT_INTEGRATION            = 0x2B20;
     public static final int PARSE_WEBSERVICES_XML                       = 0x2C00;
     public static final int PARSE_DATA_SOURCE_DEFINITION                = 0x2D00;
     public static final int PARSE_EJB_CONTEXT_BINDING                   = 0x2E00;
     public static final int PARSE_PERSISTENCE_UNIT                      = 0x2F00;
-    public static final int PARSE_PERSISTENCE_ANNOTATION                = 0x3000;
+//    public static final int PARSE_PERSISTENCE_ANNOTATION                = 0x3000;
     public static final int PARSE_INTERCEPTORS_ANNOTATION               = 0x3100;
     public static final int PARSE_LIEFCYCLE_ANNOTATION                  = 0x3200;
     public static final int PARSE_AROUNDINVOKE_ANNOTATION               = 0x3300;
@@ -267,6 +266,13 @@ public enum Phase {
     public static final int PARSE_EJB_INJECTION_ANNOTATION              = 0x3700;
     public static final int PARSE_WEB_SERVICE_INJECTION_ANNOTATION      = 0x3800;
 
+    // last add the configurators
+    public static final int PARSE_INSTANTIATE_AND_INJECT_CONFIGURATOR   = 0x5000;
+    public static final int PARSE_DISPATCH_VIEW_CONFIGURATOR            = 0x5010;
+    public static final int PARSE_DISPATCH_COMPONENT_CONFIGURATOR       = 0x5020;
+    // TODO: separate parsing from configurator setup
+    public static final int PARSE_PERSISTENCE_ANNOTATION                = 0x5030;
+    public static final int PARSE_WELD_COMPONENT_INTEGRATION            = 0x5040;
 
     // DEPENDENCIES
     public static final int DEPENDENCIES_MODULE                         = 0x0100;

@@ -489,9 +489,9 @@ public abstract class SessionBeanComponentDescription extends EJBComponentDescri
             @Override
             public void configure(DeploymentPhaseContext context, ComponentDescription description, ComponentConfiguration configuration) throws DeploymentUnitProcessingException {
                 if(SessionBean.class.isAssignableFrom(configuration.getComponentClass())) {
-                    configuration.getPostConstructInterceptors().addFirst(new ImmediateInterceptorFactory(SessionBeanSessionContextInjectionInterceptor.INSTANCE));
+                    configuration.getPostConstructInterceptors().add(new ImmediateInterceptorFactory(SessionBeanSessionContextInjectionInterceptor.INSTANCE));
                 }
-                configuration.getPostConstructInterceptors().addFirst(new ImmediateInterceptorFactory(new SessionInvocationContextInterceptor()));
+                configuration.getPostConstructInterceptors().add(new ImmediateInterceptorFactory(new SessionInvocationContextInterceptor()));
             }
         });
     }

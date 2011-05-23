@@ -75,7 +75,7 @@ public class WeldComponentIntegrationProcessor implements DeploymentUnitProcesso
             } else {
                 beanName = null;
             }
-            component.getConfigurators().addFirst(new ComponentConfigurator() {
+            component.getConfigurators().add(new ComponentConfigurator() {
                 @Override
                 public void configure(final DeploymentPhaseContext context, final ComponentDescription description, final ComponentConfiguration configuration) throws DeploymentUnitProcessingException {
                     final Class<?> componentClass = configuration.getModuleClassConfiguration().getModuleClass();
@@ -95,7 +95,7 @@ public class WeldComponentIntegrationProcessor implements DeploymentUnitProcesso
 
                     addWeldInstantiator(context.getServiceTarget(), configuration, componentClass, beanName, deploymentUnit.getServiceName(), beanManagerServiceName, interceptorClasses, classLoader);
 
-                    configuration.getPostConstructInterceptors().addLast(new WeldInjectionInterceptor.Factory(configuration, interceptorClasses));
+                    configuration.getPostConstructInterceptors().add(new WeldInjectionInterceptor.Factory(configuration, interceptorClasses));
                 }
             });
 

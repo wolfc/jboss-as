@@ -328,11 +328,11 @@ public class JPAAnnotationParseProcessor implements DeploymentUnitProcessor {
         // if it's a SFSB and extended persistence context then setup appropriate interceptors
         if (componentDescription.isStateful() && isExtendedPersistenceContext(annotation)) {
             // first setup the post construct and pre destroy component interceptors
-            componentDescription.getConfigurators().addFirst(new ComponentConfigurator() {
+            componentDescription.getConfigurators().add(new ComponentConfigurator() {
                 @Override
                 public void configure(DeploymentPhaseContext context, ComponentDescription description, ComponentConfiguration configuration) throws DeploymentUnitProcessingException {
-                    configuration.getPostConstructInterceptors().addFirst(new SFSBCreateInterceptorFactory());
-                    configuration.getPreDestroyInterceptors().addFirst(new SFSBDestroyInterceptorFactory());
+                    configuration.getPostConstructInterceptors().add(new SFSBCreateInterceptorFactory());
+                    configuration.getPreDestroyInterceptors().add(new SFSBDestroyInterceptorFactory());
                 }
             });
 
@@ -342,12 +342,12 @@ public class JPAAnnotationParseProcessor implements DeploymentUnitProcessor {
             // invocations on the view"?
             List<ViewDescription> views = componentDescription.getViews();
             for (ViewDescription view : views) {
-                view.getConfigurators().addFirst(new ViewConfigurator() {
+                view.getConfigurators().add(new ViewConfigurator() {
                     @Override
                     public void configure(DeploymentPhaseContext context, ComponentConfiguration componentConfiguration, ViewDescription description, ViewConfiguration configuration) throws DeploymentUnitProcessingException {
                         Method[] viewMethods = configuration.getProxyFactory().getCachedMethods();
                         for (Method viewMethod : viewMethods) {
-                            configuration.getViewInterceptorDeque(viewMethod).addFirst(new ImmediateInterceptorFactory(SFSBInvocationInterceptor.INSTANCE));
+                            configuration.getViewInterceptorDeque(viewMethod).add(new ImmediateInterceptorFactory(SFSBInvocationInterceptor.INSTANCE));
                         }
                     }
                 });
@@ -361,7 +361,7 @@ public class JPAAnnotationParseProcessor implements DeploymentUnitProcessor {
                 @Override
                 public void configure(DeploymentPhaseContext context, ComponentDescription description, ComponentConfiguration configuration) throws DeploymentUnitProcessingException {
                     for (Method method : configuration.getDefinedComponentMethods()) {
-                        configuration.getComponentInterceptorDeque(method).addFirst(new ImmediateInterceptorFactory(SBInvocationInterceptor.INSTANCE));
+                        configuration.getComponentInterceptorDeque(method).add(new ImmediateInterceptorFactory(SBInvocationInterceptor.INSTANCE));
                     }
                 }
             });

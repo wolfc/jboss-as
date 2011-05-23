@@ -32,6 +32,7 @@ import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -52,8 +53,8 @@ public class ComponentConfiguration {
     private ComponentCreateServiceFactory componentCreateServiceFactory = ComponentCreateServiceFactory.BASIC;
 
     // Interceptor config
-    private final Deque<InterceptorFactory> postConstructInterceptors = new ArrayDeque<InterceptorFactory>();
-    private final Deque<InterceptorFactory> preDestroyInterceptors = new ArrayDeque<InterceptorFactory>();
+    private final Queue<InterceptorFactory> postConstructInterceptors = new ArrayDeque<InterceptorFactory>();
+    private final Queue<InterceptorFactory> preDestroyInterceptors = new ArrayDeque<InterceptorFactory>();
     private final Map<Method, Deque<InterceptorFactory>> componentInterceptors = new IdentityHashMap<Method, Deque<InterceptorFactory>>();
 
     // Component instance management
@@ -112,7 +113,7 @@ public class ComponentConfiguration {
      * @param method the component method
      * @return the deque
      */
-    public Deque<InterceptorFactory> getComponentInterceptorDeque(Method method) {
+    public Queue<InterceptorFactory> getComponentInterceptorDeque(Method method) {
         Map<Method, Deque<InterceptorFactory>> map = componentInterceptors;
         Deque<InterceptorFactory> deque = map.get(method);
         if (deque == null) {
@@ -153,7 +154,7 @@ public class ComponentConfiguration {
      *
      * @return the deque
      */
-    public Deque<InterceptorFactory> getPostConstructInterceptors() {
+    public Queue<InterceptorFactory> getPostConstructInterceptors() {
         return postConstructInterceptors;
     }
 
@@ -162,7 +163,7 @@ public class ComponentConfiguration {
      *
      * @return the deque
      */
-    public Deque<InterceptorFactory> getPreDestroyInterceptors() {
+    public Queue<InterceptorFactory> getPreDestroyInterceptors() {
         return preDestroyInterceptors;
     }
 

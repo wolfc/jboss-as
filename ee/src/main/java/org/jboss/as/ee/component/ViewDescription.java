@@ -24,24 +24,15 @@ package org.jboss.as.ee.component;
 
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.reflect.ClassReflectionIndex;
-import org.jboss.as.server.deployment.reflect.ClassReflectionIndexUtil;
-import org.jboss.as.server.deployment.reflect.DeploymentReflectionIndex;
-import org.jboss.invocation.ImmediateInterceptorFactory;
-import org.jboss.invocation.Interceptor;
-import org.jboss.invocation.InterceptorContext;
-import org.jboss.invocation.Interceptors;
 import org.jboss.msc.service.ServiceName;
 
-import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
-
-import static org.jboss.as.server.deployment.Attachments.REFLECTION_INDEX;
 
 /**
  * A description of a view.
@@ -123,36 +114,13 @@ public class ViewDescription {
      *
      * @return the configurators
      */
-    public Deque<ViewConfigurator> getConfigurators() {
+    public Queue<ViewConfigurator> getConfigurators() {
         return configurators;
     }
-
-    static final ImmediateInterceptorFactory CLIENT_DISPATCHER_INTERCEPTOR_FACTORY = new ImmediateInterceptorFactory(new Interceptor() {
-        public Object processInvocation(final InterceptorContext context) throws Exception {
-            ComponentViewInstance viewInstance = context.getPrivateData(ComponentViewInstance.class);
-            return viewInstance.getEntryPoint(context.getMethod()).processInvocation(context);
-        }
-    });
 
     private static class DefaultConfigurator implements ViewConfigurator {
 
         public void configure(final DeploymentPhaseContext context, final ComponentConfiguration componentConfiguration, final ViewDescription description, final ViewConfiguration configuration) throws DeploymentUnitProcessingException {
-            // Create method indexes
-            DeploymentReflectionIndex reflectionIndex = context.getDeploymentUnit().getAttachment(REFLECTION_INDEX);
-            ClassReflectionIndex<?> index = reflectionIndex.getClassIndex(componentConfiguration.getComponentClass());
-            Method[] methods = configuration.getProxyFactory().getCachedMethods();
-            for (Method method : methods) {
-                final Method componentMethod = ClassReflectionIndexUtil.findRequiredMethod(reflectionIndex, index, method);
-                configuration.getViewInterceptorDeque(method).addLast(new ImmediateInterceptorFactory(new ComponentDispatcherInterceptor(componentMethod)));
-                configuration.getClientInterceptorDeque(method).addLast(CLIENT_DISPATCHER_INTERCEPTOR_FACTORY);
-            }
-
-            configuration.getViewPostConstructInterceptors().addLast(Interceptors.getTerminalInterceptorFactory());
-            configuration.getViewPreDestroyInterceptors().addLast(Interceptors.getTerminalInterceptorFactory());
-
-            configuration.getClientPostConstructInterceptors().addLast(Interceptors.getTerminalInterceptorFactory());
-            configuration.getClientPreDestroyInterceptors().addLast(Interceptors.getTerminalInterceptorFactory());
-
             // Create view bindings
             final List<BindingConfiguration> bindingConfigurations = configuration.getBindingConfigurations();
             List<String> viewNameParts = description.getViewNameParts();
@@ -165,31 +133,6 @@ public class ViewDescription {
             }
             for (String bindingName : description.getBindingNames()) {
                 bindingConfigurations.add(new BindingConfiguration(bindingName, new ViewBindingInjectionSource(serviceName)));
-            }
-        }
-    }
-
-    private static class ComponentDispatcherInterceptor implements Interceptor {
-
-        private final Method componentMethod;
-
-        public ComponentDispatcherInterceptor(final Method componentMethod) {
-            this.componentMethod = componentMethod;
-        }
-
-        public Object processInvocation(final InterceptorContext context) throws Exception {
-            ComponentInstance componentInstance = context.getPrivateData(ComponentInstance.class);
-            if (componentInstance == null) {
-                throw new IllegalStateException("No component instance associated");
-            }
-            Method oldMethod = context.getMethod();
-            try {
-                context.setMethod(componentMethod);
-                context.setTarget(componentInstance.getInstance());
-                return componentInstance.getInterceptor(componentMethod).processInvocation(context);
-            } finally {
-                context.setMethod(oldMethod);
-                context.setTarget(null);
             }
         }
     }

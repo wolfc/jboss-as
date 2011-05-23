@@ -68,10 +68,10 @@ public final class NamespaceConfigurator implements ComponentConfigurator {
             }
         });
         final InterceptorFactory interceptorFactory = new ImmediateInterceptorFactory(new NamespaceContextInterceptor(selector));
-        configuration.getPostConstructInterceptors().addFirst(interceptorFactory);
-        configuration.getPreDestroyInterceptors().addFirst(interceptorFactory);
+        configuration.getPostConstructInterceptors().add(interceptorFactory);
+        configuration.getPreDestroyInterceptors().add(interceptorFactory);
         for (Method method : configuration.getDefinedComponentMethods()) {
-            configuration.getComponentInterceptorDeque(method).addFirst(interceptorFactory);
+            configuration.getComponentInterceptorDeque(method).add(interceptorFactory);
         }
     }
 }

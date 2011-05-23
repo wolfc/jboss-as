@@ -143,7 +143,7 @@ public class MessageDrivenComponentDescription extends EJBComponentDescription {
         this.getConfigurators().add(new ComponentConfigurator() {
             @Override
             public void configure(DeploymentPhaseContext context, ComponentDescription description, ComponentConfiguration configuration) throws DeploymentUnitProcessingException {
-                configuration.getPostConstructInterceptors().addFirst(new ImmediateInterceptorFactory(new MessageDrivenInvocationContextInterceptor()));
+                configuration.getPostConstructInterceptors().add(new ImmediateInterceptorFactory(new MessageDrivenInvocationContextInterceptor()));
             }
         });
     }

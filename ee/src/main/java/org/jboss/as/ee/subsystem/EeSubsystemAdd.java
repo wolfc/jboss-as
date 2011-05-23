@@ -30,14 +30,17 @@ import org.jboss.as.controller.ResultHandler;
 import org.jboss.as.ee.beanvalidation.BeanValidationFactoryDeployer;
 import org.jboss.as.ee.component.AroundInvokeAnnotationParsingProcessor;
 import org.jboss.as.ee.component.ComponentInstallProcessor;
+import org.jboss.as.ee.component.DispatchComponentConfigurator;
+import org.jboss.as.ee.component.DispatchViewConfigurator;
 import org.jboss.as.ee.component.EEModuleConfigurationProcessor;
-import org.jboss.as.ee.component.InterceptorsAnnotationParsingProcessor;
 import org.jboss.as.ee.component.EEModuleInitialProcessor;
 import org.jboss.as.ee.component.EEModuleNameProcessor;
-import org.jboss.as.ee.component.ResourceReferenceProcessor;
+import org.jboss.as.ee.component.InstantiateAndInjectComponentConfigurator;
+import org.jboss.as.ee.component.InterceptorsAnnotationParsingProcessor;
 import org.jboss.as.ee.component.LifecycleAnnotationParsingProcessor;
 import org.jboss.as.ee.component.ModuleJndiBindingProcessor;
 import org.jboss.as.ee.component.ResourceInjectionAnnotationParsingProcessor;
+import org.jboss.as.ee.component.ResourceReferenceProcessor;
 import org.jboss.as.ee.managedbean.processors.JavaEEDependencyProcessor;
 import org.jboss.as.ee.managedbean.processors.ManagedBeanAnnotationProcessor;
 import org.jboss.as.ee.managedbean.processors.ManagedBeanSubDeploymentMarkingProcessor;
@@ -59,7 +62,9 @@ import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
 /**
  * Handler for adding the ee subsystem.
@@ -106,6 +111,9 @@ public class EeSubsystemAdd implements ModelAddOperationHandler, BootOperationHa
             updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_LIEFCYCLE_ANNOTATION, new LifecycleAnnotationParsingProcessor());
             updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_AROUNDINVOKE_ANNOTATION, new AroundInvokeAnnotationParsingProcessor());
             updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_RESOURCE_INJECTION_ANNOTATION, new ResourceInjectionAnnotationParsingProcessor());
+            updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_INSTANTIATE_AND_INJECT_CONFIGURATOR, new InstantiateAndInjectComponentConfigurator());
+            updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_DISPATCH_VIEW_CONFIGURATOR, new DispatchViewConfigurator());
+            updateContext.addDeploymentProcessor(Phase.PARSE, Phase.PARSE_DISPATCH_COMPONENT_CONFIGURATOR, new DispatchComponentConfigurator());
 
             updateContext.addDeploymentProcessor(Phase.DEPENDENCIES, Phase.DEPENDENCIES_MANAGED_BEAN, new JavaEEDependencyProcessor());
             updateContext.addDeploymentProcessor(Phase.DEPENDENCIES, Phase.DEPENDENCIES_GLOBAL_MODULES, new GlobalModuleDependencyProcessor(globalModules));

@@ -47,10 +47,10 @@ import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagementType;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -117,7 +117,7 @@ public abstract class EJBComponentDescription extends ComponentDescription {
             setNamingMode(ComponentNamingMode.CREATE);
         }
 
-        getConfigurators().addFirst(new NamespaceConfigurator());
+        getConfigurators().add(new NamespaceConfigurator());
         getConfigurators().add(new EjbJarConfigurationConfigurator());
 
         // setup a dependency on the EJBUtilities service
@@ -270,8 +270,8 @@ public abstract class EJBComponentDescription extends ComponentDescription {
                 Method[] methods = configuration.getProxyFactory().getCachedMethods();
                 for (Method method : methods) {
                     if (TO_STRING_METHOD.equals(method)) {
-                        final Deque<InterceptorFactory> clientInterceptorsForMethod = configuration.getClientInterceptorDeque(method);
-                        clientInterceptorsForMethod.addFirst(new ImmediateInterceptorFactory(new ToStringMethodInterceptor()));
+                        final Queue<InterceptorFactory> clientInterceptorsForMethod = configuration.getClientInterceptorDeque(method);
+                        clientInterceptorsForMethod.add(new ImmediateInterceptorFactory(new ToStringMethodInterceptor()));
                         return;
                     }
                 }

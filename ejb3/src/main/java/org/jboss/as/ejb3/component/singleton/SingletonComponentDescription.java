@@ -110,7 +110,7 @@ public class SingletonComponentDescription extends SessionBeanComponentDescripti
         super.setupViewInterceptors(view);
 
         // add instance associating interceptor at the start of the interceptor chain
-        view.getConfigurators().addFirst(new ViewConfigurator() {
+        view.getConfigurators().add(new ViewConfigurator() {
             @Override
             public void configure(DeploymentPhaseContext context, ComponentConfiguration componentConfiguration, ViewDescription description, ViewConfiguration configuration) throws DeploymentUnitProcessingException {
 

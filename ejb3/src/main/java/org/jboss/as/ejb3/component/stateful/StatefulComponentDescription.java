@@ -49,8 +49,8 @@ import org.jboss.msc.service.ServiceName;
 import javax.ejb.TransactionManagementType;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -176,8 +176,8 @@ public class StatefulComponentDescription extends SessionBeanComponentDescriptio
                 InterceptorFactory sessionIdGeneratingInterceptorFactory = new StatefulComponentSessionIdGeneratingInterceptorFactory(sessionIdContextKey);
 
                 // add the session id generating interceptor to the start of the *post-construct interceptor chain of the ComponentViewInstance*
-                viewConfiguration.getViewPostConstructInterceptors().addFirst(sessionIdGeneratingInterceptorFactory);
-                viewConfiguration.getViewPreDestroyInterceptors().addFirst(new StatefulComponentInstanceDestroyInterceptorFactory(sessionIdContextKey));
+                viewConfiguration.getViewPostConstructInterceptors().add(sessionIdGeneratingInterceptorFactory);
+                viewConfiguration.getViewPreDestroyInterceptors().add(new StatefulComponentInstanceDestroyInterceptorFactory(sessionIdContextKey));
 
                 viewConfiguration.addViewInterceptorToFront(new StatefulIdentityInterceptorFactory(sessionIdContextKey));
             }
@@ -206,11 +206,11 @@ public class StatefulComponentDescription extends SessionBeanComponentDescriptio
                     final MethodIdentifier viewMethodIdentifier = MethodIdentifier.getIdentifierForMethod(viewMethod);
                     for (final StatefulRemoveMethod removeMethod : removeMethods) {
                         if (removeMethod.methodIdentifier.equals(viewMethodIdentifier)) {
-                            final Deque<InterceptorFactory> methodInterceptors = configuration.getViewInterceptorDeque(viewMethod);
+                            final Queue<InterceptorFactory> methodInterceptors = configuration.getViewInterceptorDeque(viewMethod);
                             // TODO: This need *not* really be placed first. But given the current interceptor framework setup,
                             // we have to add this first to avoid the mess. Once https://issues.jboss.org/browse/AS7-834 is implemented,
                             // this needs to be added at the right place in the interceptor chain.
-                            methodInterceptors.addFirst(new ImmediateInterceptorFactory(new StatefulRemoveInterceptor(removeMethod.retainIfException)));
+                            methodInterceptors.add(new ImmediateInterceptorFactory(new StatefulRemoveInterceptor(removeMethod.retainIfException)));
                             break;
                         }
                     }

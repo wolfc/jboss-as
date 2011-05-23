@@ -33,6 +33,7 @@ import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 /**
  * A configuration of a component view.
@@ -94,7 +95,7 @@ public class ViewConfiguration {
      * @param method the method to look up
      * @return the interceptor deque for this method
      */
-    public Deque<InterceptorFactory> getViewInterceptorDeque(Method method) {
+    public Queue<InterceptorFactory> getViewInterceptorDeque(Method method) {
         Map<Method, Deque<InterceptorFactory>> map = viewInterceptors;
         Deque<InterceptorFactory> deque = map.get(method);
         if (deque == null) {
@@ -112,7 +113,7 @@ public class ViewConfiguration {
      * @param method the method to look up
      * @return the interceptor deque for this method
      */
-    public Deque<InterceptorFactory> getClientInterceptorDeque(Method method) {
+    public Queue<InterceptorFactory> getClientInterceptorDeque(Method method) {
         Map<Method, Deque<InterceptorFactory>> map = clientInterceptors;
         Deque<InterceptorFactory> deque = map.get(method);
         if (deque == null) {
@@ -126,7 +127,7 @@ public class ViewConfiguration {
      *
      * @return the interceptor deque
      */
-    public Deque<InterceptorFactory> getViewPostConstructInterceptors() {
+    public Queue<InterceptorFactory> getViewPostConstructInterceptors() {
         return viewPostConstructInterceptors;
     }
 
@@ -135,7 +136,7 @@ public class ViewConfiguration {
      *
      * @return the interceptor deque
      */
-    public Deque<InterceptorFactory> getClientPostConstructInterceptors() {
+    public Queue<InterceptorFactory> getClientPostConstructInterceptors() {
         return clientPostConstructInterceptors;
     }
 
@@ -144,7 +145,7 @@ public class ViewConfiguration {
      *
      * @return the interceptor deque
      */
-    public Deque<InterceptorFactory> getViewPreDestroyInterceptors() {
+    public Queue<InterceptorFactory> getViewPreDestroyInterceptors() {
         return viewPreDestroyInterceptors;
     }
 
@@ -153,7 +154,7 @@ public class ViewConfiguration {
      *
      * @return the interceptor deque
      */
-    public Deque<InterceptorFactory> getClientPreDestroyInterceptors() {
+    public Queue<InterceptorFactory> getClientPreDestroyInterceptors() {
         return clientPreDestroyInterceptors;
     }
 
@@ -193,8 +194,8 @@ public class ViewConfiguration {
     public void addViewInterceptorToFront(InterceptorFactory interceptorFactory) {
         Method[] allMethodsOnView = this.proxyFactory.getCachedMethods();
         for (Method method : allMethodsOnView) {
-            Deque<InterceptorFactory> interceptorsForMethod = this.getViewInterceptorDeque(method);
-            interceptorsForMethod.addFirst(interceptorFactory);
+            Queue<InterceptorFactory> interceptorsForMethod = this.getViewInterceptorDeque(method);
+            interceptorsForMethod.add(interceptorFactory);
         }
     }
 
@@ -207,8 +208,8 @@ public class ViewConfiguration {
     public void addViewInterceptorToBack(InterceptorFactory interceptorFactory) {
         Method[] allMethodsOnView = this.proxyFactory.getCachedMethods();
         for (Method method : allMethodsOnView) {
-            Deque<InterceptorFactory> interceptorsForMethod = this.getViewInterceptorDeque(method);
-            interceptorsForMethod.addFirst(interceptorFactory);
+            Queue<InterceptorFactory> interceptorsForMethod = this.getViewInterceptorDeque(method);
+            interceptorsForMethod.add(interceptorFactory);
         }
     }
 
@@ -221,7 +222,7 @@ public class ViewConfiguration {
     public void addClientViewInterceptor(InterceptorFactory interceptorFactory) {
         Method[] allMethodsOnView = this.proxyFactory.getCachedMethods();
         for (Method method : allMethodsOnView) {
-            Deque<InterceptorFactory> interceptorsForMethod = this.getClientInterceptorDeque(method);
+            Queue<InterceptorFactory> interceptorsForMethod = this.getClientInterceptorDeque(method);
             interceptorsForMethod.add(interceptorFactory);
         }
     }
