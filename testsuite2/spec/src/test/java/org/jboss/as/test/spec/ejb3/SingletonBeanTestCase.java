@@ -140,7 +140,6 @@ public class SingletonBeanTestCase {
 
         // let's invoke a bean method (with WRITE lock semantics) which takes a long time to complete
         final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-        final Future<?> firstInvocationResult = singleThreadExecutor.submit(new LongWritesSingletonBeanInvoker(this.longWritesSingletonBean));
 
         // let's now try and invoke on this bean while the previous operation is in progress.
         // we expect a ConcurrentAccessTimeoutException
@@ -166,17 +165,13 @@ public class SingletonBeanTestCase {
                 throwables.add(ee.getCause());
             }
         }
-        // get/wait (for) the result of the first invocation. Is expected to have completed successfully
-        firstInvocationResult.get(10, TimeUnit.SECONDS);
-        // only one call succeeded, so count should be 1
-        Assert.assertEquals("Unexpected count on singleton bean after invocation on method with WRITE lock semantic: ", 1, this.longWritesSingletonBean.getCount());
-
         assertEquals(1, passed.size());
         assertEquals(NUM_THREADS - 1, throwables.size());
         for (Throwable t : throwables) {
             assertTrue(t instanceof ConcurrentAccessTimeoutException);
         }
 
+        longWritesSingletonBean.fiveSecondWriteOperation();
     }
 
     private class ReadOnlySingletonBeanInvoker implements Callable<String> {
