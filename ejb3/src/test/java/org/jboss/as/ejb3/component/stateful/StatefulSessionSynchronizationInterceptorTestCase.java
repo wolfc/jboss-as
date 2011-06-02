@@ -27,6 +27,7 @@ import org.jboss.ejb3.cache.Cache;
 import org.jboss.invocation.Interceptor;
 import org.jboss.invocation.InterceptorContext;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -34,6 +35,7 @@ import javax.ejb.AccessTimeout;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.TransactionSynchronizationRegistry;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,8 +46,12 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -166,5 +172,58 @@ public class StatefulSessionSynchronizationInterceptorTestCase {
         when(transactionSynchronizationRegistry.getTransactionKey()).thenReturn("TX2");
 
         interceptor.processInvocation(context);
+    }
+
+    /**
+     * When a system exception has occurred in a business method invocation, then instance is discarded.
+     * SessionSynchronization callbacks should not occur anymore.
+     */
+    @Test
+    public void testSystemException() throws Exception {
+        final Interceptor interceptor = new StatefulSessionSynchronizationInterceptor();
+        final InterceptorContext context = new InterceptorContext();
+        context.setInterceptors(Arrays.asList(noop()));
+        final StatefulSessionComponent component = mock(StatefulSessionComponent.class);
+        context.putPrivateData(Component.class, component);
+        when(component.getAccessTimeout(null)).thenReturn(defaultAccessTimeout());
+        Cache<StatefulSessionComponentInstance> cache = mock(Cache.class);
+        when(component.getCache()).thenReturn(cache);
+        final TransactionSynchronizationRegistry transactionSynchronizationRegistry = mock(TransactionSynchronizationRegistry.class);
+        when(component.getTransactionSynchronizationRegistry()).thenReturn(transactionSynchronizationRegistry);
+        when(transactionSynchronizationRegistry.getTransactionKey()).thenReturn("TX1");
+        final List<Synchronization> synchronizations = new LinkedList<Synchronization>();
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Synchronization synchronization = (Synchronization) invocation.getArguments()[0];
+                synchronizations.add(synchronization);
+                return null;
+            }
+        }).when(transactionSynchronizationRegistry).registerInterposedSynchronization((Synchronization) any());
+        final StatefulSessionComponentInstance instance = mock(StatefulSessionComponentInstance.class);
+        doAnswer(CALLS_REAL_METHODS).when(instance).discard();
+        when(instance.getComponent()).thenReturn(component);
+        doThrow(new RuntimeException("from afterCompletion")).when(instance).afterCompletion(false);
+
+        context.putPrivateData(ComponentInstance.class, instance);
+
+        interceptor.processInvocation(context);
+        // simulate the discard
+        instance.discard();
+        verify(cache).discard(Matchers.<Serializable>any());
+
+        // commit
+        for (Synchronization synchronization : synchronizations) {
+            synchronization.beforeCompletion();
+        }
+        for (Synchronization synchronization : synchronizations) {
+            try {
+                synchronization.afterCompletion(Status.STATUS_ROLLEDBACK);
+            } catch (Throwable t) {
+                // ignore
+            }
+        }
+        synchronizations.clear();
+        verifyNoMoreInteractions(cache);
     }
 }
