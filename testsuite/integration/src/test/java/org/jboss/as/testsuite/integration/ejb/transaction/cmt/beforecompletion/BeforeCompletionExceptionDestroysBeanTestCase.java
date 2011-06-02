@@ -29,6 +29,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.ejb.EJBTransactionRolledbackException;
 import javax.ejb.NoSuchEJBException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -38,6 +39,8 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
+
+import static org.junit.Assert.fail;
 
 /**
  * Test that ensures that a SFSB is destroyed if an exception is thrown by it's @BeforeCompletion method
@@ -64,13 +67,14 @@ public class BeforeCompletionExceptionDestroysBeanTestCase {
         //commit, this should destroy the bean, as it's @BeforeCompletion method will throw an exception
         try {
             userTransaction.commit();
+            fail("Expected RollbackException");
         } catch (RollbackException expected ) {
 
         }
         try {
             userTransaction.begin();
             bean.enlist();
-            throw new RuntimeException("Expected SFSB to be destroyed");
+            fail("Expected NoSuchEJBException (EJB 3.1 FR 14.3.7)");
         } catch (NoSuchEJBException expected) {
 
         } finally {
@@ -78,5 +82,28 @@ public class BeforeCompletionExceptionDestroysBeanTestCase {
         }
     }
 
+    @Test
+    public void testExceptionInBusinessInvocation() throws NamingException, SystemException, NotSupportedException,  HeuristicRollbackException, HeuristicMixedException {
+        final UserTransaction userTransaction = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
+        final BarfSFSB bean = (BarfSFSB) new InitialContext().lookup("java:module/" + BarfSFSB.class.getSimpleName());
+        //begin a transaction
+        userTransaction.begin();
+        try {
+            bean.enlist();
+            bean.barf();
+            fail("Expected EJBTransactionRolledbackException (EJB 3.1 FR 14.3.1)");
+        } catch (EJBTransactionRolledbackException e) {
+        }
+        userTransaction.rollback();
+        try {
+            userTransaction.begin();
+            bean.enlist();
+            fail("Expected NoSuchEJBException (EJB 3.1 FR 14.3.7)");
+        } catch (NoSuchEJBException expected) {
+
+        } finally {
+            userTransaction.rollback();
+        }
+    }
 
 }
