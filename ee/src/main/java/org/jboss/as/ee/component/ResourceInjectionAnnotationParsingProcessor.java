@@ -233,30 +233,34 @@ public class ResourceInjectionAnnotationParsingProcessor implements DeploymentUn
             valueSource = new LookupInjectionSource(localContextName);
         }
 
-        // the binding/injection is optional if it's a env-entry which doesn't a env-entry-value or a lookup value
-        final boolean optionalEnvEntry = valueSource == null;
-        // our injection comes from the local lookup, no matter what.
-        final InjectionSource injectionSource = new LookupInjectionSource(localContextName);
-        final ResourceInjectionConfiguration injectionConfiguration = targetDescription != null ?
-                new ResourceInjectionConfiguration(targetDescription, injectionSource) : null;
+        // EE.5.2.4
+        // Each injection of an object corresponds to a JNDI lookup. Whether a new
+        // instance of the requested object is injected, or whether a shared instance is
+        // injected, is determined by the rules described above.
 
-        if (optionalEnvEntry) {
+        // Because of performance we allow any type of InjectionSource.
+
+        if (valueSource == null) {
+            // the ResourceInjectionConfiguration is created by LazyResourceInjection
             LazyResourceInjection lazyResourceInjection = new LazyResourceInjection(targetDescription, localContextName , classDescription);
             eeModuleDescription.addLazyResourceInjection(lazyResourceInjection);
         } else {
+            // our injection comes from the local lookup, no matter what.
+            final InjectionSource injectionSource = new LookupInjectionSource(localContextName);
+            final ResourceInjectionConfiguration injectionConfiguration = targetDescription != null ?
+                    new ResourceInjectionConfiguration(targetDescription, injectionSource) : null;
+
             final BindingConfiguration bindingConfiguration = new BindingConfiguration(localContextName, valueSource);
             // TODO: class hierarchies? shared bindings?
             classDescription.getConfigurators().add(new ClassConfigurator() {
                 public void configure(final DeploymentPhaseContext context, final EEModuleClassDescription description, final EEModuleClassConfiguration configuration) throws DeploymentUnitProcessingException {
                     configuration.getBindingConfigurations().add(bindingConfiguration);
-                    if (injectionConfiguration != null && !optionalEnvEntry) {
+                    if (injectionConfiguration != null) {
                         configuration.getInjectionConfigurations().add(injectionConfiguration);
                     }
                 }
             });
         }
-
-
     }
 
     private boolean isEmpty(final String string) {
