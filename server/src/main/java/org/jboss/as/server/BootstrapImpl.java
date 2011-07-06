@@ -22,8 +22,6 @@
 
 package org.jboss.as.server;
 
-import java.util.List;
-
 import org.jboss.as.controller.persistence.ConfigurationPersister;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
@@ -40,13 +38,23 @@ import org.jboss.threads.AsyncFuture;
 import org.jboss.threads.AsyncFutureTask;
 import org.jboss.threads.JBossExecutors;
 
+import java.util.List;
+
+import static java.lang.Integer.getInteger;
+import static java.lang.Math.max;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * The bootstrap implementation.
  *
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  */
 final class BootstrapImpl implements Bootstrap {
-    private final ServiceContainer container = ServiceContainer.Factory.create("jboss-as");
+    private final ServiceContainer container = ServiceContainer.Factory.create("jboss-as", getInteger("org.jboss.as.mscCoreThreads", max(availableProcessors(), 1)), getInteger("org.jboss.as.mscMaxThreads", max(availableProcessors() << 1, 2)), 30L, SECONDS);
+
+    private static int availableProcessors() {
+        return Runtime.getRuntime().availableProcessors();
+    }
 
     @Override
     public AsyncFuture<ServiceContainer> bootstrap(final Configuration configuration, final List<ServiceActivator> extraServices) {
