@@ -22,9 +22,7 @@
 
 package org.jboss.as.controller.parsing;
 
-import org.jboss.as.controller.HashUtil;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INCLUDE;
 import org.jboss.as.controller.persistence.ModelMarshallingContext;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.dmr.ModelNode;
@@ -50,7 +48,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEF
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEPLOYMENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ENABLED;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.EXTENSION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HASH;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INCLUDE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INCLUDES;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INTERFACE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.JVM;
@@ -86,7 +84,7 @@ public class DomainXml extends CommonXml {
     }
 
     @Override
-    public void readElement(final XMLExtendedStreamReader reader, final List<ModelNode> nodes) throws XMLStreamException {
+    public void readElement(final XMLExtendedStreamReader reader, final Collection<ModelNode> nodes) throws XMLStreamException {
         readDomainElement(reader, new ModelNode(), nodes);
     }
 
@@ -142,7 +140,7 @@ public class DomainXml extends CommonXml {
         writer.writeEndDocument();
     }
 
-    void readDomainElement(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    void readDomainElement(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
 
         parseNamespaces(reader, address, list);
 
@@ -234,7 +232,7 @@ public class DomainXml extends CommonXml {
 
     }
 
-    void parseDomainSocketBindingGroups(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list, final Set<String> interfaces) throws XMLStreamException {
+    void parseDomainSocketBindingGroups(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list, final Set<String> interfaces) throws XMLStreamException {
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
                 case DOMAIN_1_0: {
@@ -256,7 +254,7 @@ public class DomainXml extends CommonXml {
         }
     }
 
-    void parseSocketBindingGroup(final XMLExtendedStreamReader reader, final Set<String> interfaces, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    void parseSocketBindingGroup(final XMLExtendedStreamReader reader, final Set<String> interfaces, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
         final Set<String> includedGroups = new HashSet<String>();
         final Set<String> socketBindings = new HashSet<String>();
 
@@ -308,7 +306,7 @@ public class DomainXml extends CommonXml {
         }
     }
 
-    void parseServerGroups(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    void parseServerGroups(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         requireNoAttributes(reader);
 
         final Set<String> names = new HashSet<String>();
@@ -406,7 +404,7 @@ public class DomainXml extends CommonXml {
         }
     }
 
-    void parseProfiles(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    void parseProfiles(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         requireNoAttributes(reader);
 
         final Set<String> names = new HashSet<String>();

@@ -22,6 +22,22 @@
 
 package org.jboss.as.controller.parsing;
 
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.controller.persistence.ModelMarshallingContext;
+import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
+import org.jboss.modules.ModuleLoader;
+import org.jboss.staxmapper.XMLExtendedStreamReader;
+import org.jboss.staxmapper.XMLExtendedStreamWriter;
+
+import javax.xml.stream.XMLStreamException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.AUTO_START;
@@ -33,7 +49,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INT
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.JVM;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.LOCAL;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MANAGEMENT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MANAGEMENT_INTERFACE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
@@ -53,22 +68,6 @@ import static org.jboss.as.controller.parsing.ParseUtils.requireNoContent;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.controller.persistence.ModelMarshallingContext;
-import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.Property;
-import org.jboss.modules.ModuleLoader;
-import org.jboss.staxmapper.XMLExtendedStreamReader;
-import org.jboss.staxmapper.XMLExtendedStreamWriter;
-
 /**
  * A mapper between an AS server's configuration model and XML representations, particularly {@code host.xml}
  *
@@ -82,7 +81,7 @@ public class HostXml extends CommonXml {
     }
 
     @Override
-    public void readElement(final XMLExtendedStreamReader reader, final List<ModelNode> operationList) throws XMLStreamException {
+    public void readElement(final XMLExtendedStreamReader reader, final Collection<ModelNode> operationList) throws XMLStreamException {
         final ModelNode address = new ModelNode().setEmptyList();
         if (Namespace.forUri(reader.getNamespaceURI()) != Namespace.DOMAIN_1_0 || Element.forName(reader.getLocalName()) != Element.HOST) {
             throw unexpectedElement(reader);
@@ -141,7 +140,7 @@ public class HostXml extends CommonXml {
         writer.writeEndDocument();
     }
 
-    private void readHostElement(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    private void readHostElement(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         String hostName = null;
 
         // Deffer adding the namespaces and schema locations until after the host has been created.
@@ -256,7 +255,7 @@ public class HostXml extends CommonXml {
     /**
      * Add the operation to add the local host definition.
      */
-    private void addLocalHost(final ModelNode address, final List<ModelNode> operationList, final String hostName) {
+    private void addLocalHost(final ModelNode address, final Collection<ModelNode> operationList, final String hostName) {
         // All further operations should modify the newly added host so the address passed in is updated.
         address.add(HOST,hostName);
 
@@ -271,7 +270,7 @@ public class HostXml extends CommonXml {
 
 
     private void parseDomainController(final XMLExtendedStreamReader reader,
-            final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+            final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
 
         requireNoAttributes(reader);
 
@@ -334,7 +333,7 @@ public class HostXml extends CommonXml {
     }
 
     private void parseRemoteDomainController(final XMLExtendedStreamReader reader,
-            final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+            final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         // Handle attributes
         String host = null;
         Integer port = null;
@@ -388,7 +387,7 @@ public class HostXml extends CommonXml {
         reader.discardRemainder();
     }
 
-    private void parseJvms(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    private void parseJvms(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
 
         requireNoAttributes(reader);
 
@@ -415,7 +414,7 @@ public class HostXml extends CommonXml {
     }
 
 
-    private void parseServers(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    private void parseServers(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
 
         requireNoAttributes(reader);
         // Handle elements
@@ -440,7 +439,7 @@ public class HostXml extends CommonXml {
         }
     }
 
-    private void parseServer(final XMLExtendedStreamReader reader, final ModelNode parentAddress, final List<ModelNode> list, final Set<String> serverNames) throws XMLStreamException {
+    private void parseServer(final XMLExtendedStreamReader reader, final ModelNode parentAddress, final Collection<ModelNode> list, final Set<String> serverNames) throws XMLStreamException {
         // Handle attributes
         String name = null;
         String group = null;

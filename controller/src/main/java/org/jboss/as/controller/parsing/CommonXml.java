@@ -22,6 +22,40 @@
 
 package org.jboss.as.controller.parsing;
 
+import org.jboss.as.controller.Extension;
+import org.jboss.as.controller.HashUtil;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.controller.operations.common.JVMHandlers;
+import org.jboss.as.controller.operations.common.NamespaceAddHandler;
+import org.jboss.as.controller.operations.common.SchemaLocationAddHandler;
+import org.jboss.as.controller.operations.common.SystemPropertyAddHandler;
+import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.controller.persistence.ModelMarshallingContext;
+import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
+import org.jboss.dmr.Property;
+import org.jboss.logging.Logger;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleIdentifier;
+import org.jboss.modules.ModuleLoadException;
+import org.jboss.modules.ModuleLoader;
+import org.jboss.staxmapper.XMLElementReader;
+import org.jboss.staxmapper.XMLElementWriter;
+import org.jboss.staxmapper.XMLExtendedStreamReader;
+import org.jboss.staxmapper.XMLExtendedStreamWriter;
+
+import javax.xml.stream.XMLStreamException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ANY;
@@ -30,7 +64,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.AUT
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.BASE_DN;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.BOOT_TIME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CONNECTION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CONNECTIONS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CRITERIA;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEFAULT_INTERFACE;
@@ -75,7 +108,6 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SEA
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SECRET;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SECURE_PORT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SECURITY_REALM;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SECURITY_REALMS;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SERVER_IDENTITIES;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING_GROUP;
@@ -93,7 +125,6 @@ import static org.jboss.as.controller.parsing.ParseUtils.duplicateNamedElement;
 import static org.jboss.as.controller.parsing.ParseUtils.invalidAttributeValue;
 import static org.jboss.as.controller.parsing.ParseUtils.isNoNamespaceAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.missingRequired;
-import static org.jboss.as.controller.parsing.ParseUtils.nextElement;
 import static org.jboss.as.controller.parsing.ParseUtils.parseBoundedIntegerAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.parsePossibleExpression;
 import static org.jboss.as.controller.parsing.ParseUtils.readStringAttributeElement;
@@ -105,44 +136,10 @@ import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedEndElement;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.jboss.as.controller.Extension;
-import org.jboss.as.controller.HashUtil;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
-import org.jboss.as.controller.operations.common.JVMHandlers;
-import org.jboss.as.controller.operations.common.NamespaceAddHandler;
-import org.jboss.as.controller.operations.common.SchemaLocationAddHandler;
-import org.jboss.as.controller.operations.common.SystemPropertyAddHandler;
-import org.jboss.as.controller.operations.common.Util;
-import org.jboss.as.controller.persistence.ModelMarshallingContext;
-import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.ModelType;
-import org.jboss.dmr.Property;
-import org.jboss.logging.Logger;
-import org.jboss.modules.Module;
-import org.jboss.modules.ModuleIdentifier;
-import org.jboss.modules.ModuleLoadException;
-import org.jboss.modules.ModuleLoader;
-import org.jboss.staxmapper.XMLElementReader;
-import org.jboss.staxmapper.XMLElementWriter;
-import org.jboss.staxmapper.XMLExtendedStreamReader;
-import org.jboss.staxmapper.XMLExtendedStreamWriter;
-
 /**
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
  */
-public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XMLElementWriter<ModelMarshallingContext> {
+public abstract class CommonXml implements XMLElementReader<Collection<ModelNode>>, XMLElementWriter<ModelMarshallingContext> {
 
     // TODO perhaps have this provided by subclasses via an abstract method
     private static final Logger log = Logger.getLogger("org.jboss.as.controller");
@@ -185,7 +182,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseNamespaces(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> nodes) {
+    protected void parseNamespaces(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> nodes) {
         final int namespaceCount = reader.getNamespaceCount();
         for (int i = 0; i < namespaceCount; i ++) {
             String prefix = reader.getNamespacePrefix(i);
@@ -208,7 +205,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         // TODO STXM-6
     }
 
-    protected void parseSchemaLocations(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updateList, final int idx) throws XMLStreamException {
+    protected void parseSchemaLocations(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updateList, final int idx) throws XMLStreamException {
         final List<String> elements = reader.getListAttributeValue(idx);
         final List<String> values = new ArrayList<String>();
         for(String element : elements) {
@@ -296,7 +293,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseExtensions(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseExtensions(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         requireNoAttributes(reader);
 
         final Set<String> found = new HashSet<String>();
@@ -359,7 +356,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         requireNoContent(reader);
     }
 
-    protected void parsePaths(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list, final boolean requirePath) throws XMLStreamException {
+    protected void parsePaths(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list, final boolean requirePath) throws XMLStreamException {
         final Set<String> pathNames = new HashSet<String>();
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
@@ -381,7 +378,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseManagement(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list, boolean allowInterfaces) throws XMLStreamException {
+    protected void parseManagement(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list, boolean allowInterfaces) throws XMLStreamException {
         int securityRealmsCount = 0;
         int connectionsCount = 0;
         int managementInterfacesCount = 0;
@@ -433,7 +430,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseConnections(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseConnections(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
                 case DOMAIN_1_0: {
@@ -457,7 +454,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseLdapConnection(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseLdapConnection(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         String name = null;
         String url = null;
         String searchDN = null;
@@ -527,7 +524,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         list.add(add);
     }
 
-    protected void parseSecurityRealms(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseSecurityRealms(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
                 case DOMAIN_1_0: {
@@ -550,7 +547,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseSecurityRealm(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseSecurityRealm(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         // TODO - Copy parsePath for attribute reading style.
         requireSingleAttribute(reader, Attribute.NAME.getLocalName());
         // After double checking the name of the only attribute we can retrieve it.
@@ -955,7 +952,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseManagementInterfaces(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseManagementInterfaces(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
                 case DOMAIN_1_0: {
@@ -981,7 +978,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parsePath(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list, final boolean requirePath, final Set<String> defined) throws XMLStreamException {
+    protected void parsePath(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list, final boolean requirePath, final Set<String> defined) throws XMLStreamException {
         String name = null;
         String path = null;
         String relativeTo = null;
@@ -1032,7 +1029,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         list.add(update);
     }
 
-    protected void parseSystemProperties(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates, boolean standalone) throws XMLStreamException {
+    protected void parseSystemProperties(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates, boolean standalone) throws XMLStreamException {
 
         while (reader.nextTag() != END_ELEMENT) {
             if (Namespace.forUri(reader.getNamespaceURI()) != Namespace.DOMAIN_1_0) {
@@ -1111,7 +1108,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         return properties;
     }
 
-    protected void parseHttpManagementInterface(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    protected void parseHttpManagementInterface(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         // Handle attributes
         String interfaceName = null;
         int port = -1;
@@ -1193,7 +1190,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         reader.discardRemainder();
     }
 
-    private void parseNativeManagementInterface(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    private void parseNativeManagementInterface(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         // Handle attributes
         String interfaceName = null;
         int port = 0;
@@ -1248,11 +1245,11 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         reader.discardRemainder();
     }
 
-    protected void parseJvm(final XMLExtendedStreamReader reader, final ModelNode parentAddress, final List<ModelNode> updates, final Set<String> jvmNames) throws XMLStreamException {
+    protected void parseJvm(final XMLExtendedStreamReader reader, final ModelNode parentAddress, final Collection<ModelNode> updates, final Set<String> jvmNames) throws XMLStreamException {
         parseJvm(reader, parentAddress, updates, jvmNames, false);
     }
 
-    protected void parseJvm(final XMLExtendedStreamReader reader, final ModelNode parentAddress, final List<ModelNode> updates, final Set<String> jvmNames, final boolean server) throws XMLStreamException {
+    protected void parseJvm(final XMLExtendedStreamReader reader, final ModelNode parentAddress, final Collection<ModelNode> updates, final Set<String> jvmNames, final boolean server) throws XMLStreamException {
 
         // Handle attributes
         final List<ModelNode> attrUpdates = new ArrayList<ModelNode>();
@@ -1418,7 +1415,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    private void parseHeap(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseHeap(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         String size = null;
         String maxSize = null;
@@ -1460,7 +1457,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         ParseUtils.requireNoContent(reader);
     }
 
-    private void parsePermgen(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parsePermgen(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         String size = null;
         String maxSize = null;
@@ -1502,7 +1499,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         ParseUtils.requireNoContent(reader);
     }
 
-    private void parseStack(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseStack(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         // Handle attributes
         boolean sizeSet = false;
@@ -1532,7 +1529,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         ParseUtils.requireNoContent(reader);
     }
 
-    private void parseAgentLib(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseAgentLib(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         // Handle attributes
         boolean valueSet = false;
@@ -1562,7 +1559,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         ParseUtils.requireNoContent(reader);
     }
 
-    private void parseAgentPath(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseAgentPath(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         // Handle attributes
         boolean valueSet = false;
@@ -1592,7 +1589,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         ParseUtils.requireNoContent(reader);
     }
 
-    private void parseJavaagent(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseJavaagent(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         // Handle attributes
         boolean valueSet = false;
@@ -1622,7 +1619,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         ParseUtils.requireNoContent(reader);
     }
 
-    private void parseJvmOptions(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseJvmOptions(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         // Handle attributes
         ParseUtils.requireNoAttributes(reader);
@@ -1845,7 +1842,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseInterfaces(final XMLExtendedStreamReader reader, final Set<String> names, final ModelNode address, final List<ModelNode> list, final boolean checkSpecified) throws XMLStreamException {
+    protected void parseInterfaces(final XMLExtendedStreamReader reader, final Set<String> names, final ModelNode address, final Collection<ModelNode> list, final boolean checkSpecified) throws XMLStreamException {
         requireNoAttributes(reader);
 
         while (reader.nextTag() != END_ELEMENT) {
@@ -1869,7 +1866,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         }
     }
 
-    protected void parseSocketBindingGroupRef(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    protected void parseSocketBindingGroupRef(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
         // Handle attributes
         String name = null;
         int offset = -1;
@@ -1928,7 +1925,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         updates.add(update);
     }
 
-    protected String parseSocketBinding(final XMLExtendedStreamReader reader, final Set<String> interfaces, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    protected String parseSocketBinding(final XMLExtendedStreamReader reader, final Set<String> interfaces, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
 
         final EnumSet<Attribute> required = EnumSet.of(Attribute.NAME, Attribute.PORT);
         String name = null;
@@ -2010,7 +2007,7 @@ public abstract class CommonXml implements XMLElementReader<List<ModelNode>>, XM
         return name;
     }
 
-    protected void parseDeployments(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list, final boolean allowEnabled) throws XMLStreamException {
+    protected void parseDeployments(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list, final boolean allowEnabled) throws XMLStreamException {
         requireNoAttributes(reader);
 
         final Set<String> names = new HashSet<String>();

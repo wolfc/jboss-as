@@ -81,9 +81,8 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
@@ -198,10 +197,10 @@ public final class ServerService extends AbstractControllerService {
         bootstrapListener.tick();
     }
 
-    protected void boot(List<ModelNode> bootOperations) throws ConfigurationPersistenceException {
-        final List<ModelNode> operations = new ArrayList<ModelNode>(bootOperations);
+    @Override
+    protected void boot(BlockingQueue<ModelNode> operations, final ModelNode done) throws ConfigurationPersistenceException {
         operations.add(DeployerChainAddHandler.OPERATION);
-        super.boot(operations);
+        super.boot(operations, done);
     }
 
     public void stop(final StopContext context) {

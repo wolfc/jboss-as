@@ -54,7 +54,10 @@ public final class ServiceVerificationHandler extends AbstractServiceListener<Ob
         while (outstanding > 0 || (settleTime > 0 && !problem.isEmpty())) {
             try {
                 long wait = outstanding > 0 ? 0 : settleTime;
+                System.err.println(wait);
+                long x = System.currentTimeMillis();
                 wait(wait);
+                System.err.println("Lost " + (System.currentTimeMillis() - x) + "ms");
                 if (outstanding == 0) {
                     if (start == 0) {
                         start = System.currentTimeMillis();

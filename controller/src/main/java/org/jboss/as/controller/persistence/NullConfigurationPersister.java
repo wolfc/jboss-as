@@ -22,13 +22,14 @@
 
 package org.jboss.as.controller.persistence;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLElementWriter;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A configuration persister which does not store configuration changes.
@@ -49,6 +50,11 @@ public final class NullConfigurationPersister extends AbstractConfigurationPersi
     @Override
     public PersistenceResource store(final ModelNode model, Set<PathAddress> affectedAddresses) {
         return NullPersistenceResource.INSTANCE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void load(final Collection<ModelNode> updates) {
     }
 
     /** {@inheritDoc} */

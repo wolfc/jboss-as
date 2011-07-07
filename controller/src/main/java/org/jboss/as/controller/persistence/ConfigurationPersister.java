@@ -22,13 +22,14 @@
 
 package org.jboss.as.controller.persistence;
 
+import org.jboss.as.controller.PathAddress;
+import org.jboss.dmr.ModelNode;
+
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import org.jboss.as.controller.PathAddress;
-import org.jboss.dmr.ModelNode;
 
 /**
  * The configuration persister for a model.
@@ -74,9 +75,16 @@ public interface ConfigurationPersister {
     void marshallAsXml(final ModelNode model, final OutputStream output) throws ConfigurationPersistenceException;
 
     /**
+     * Load the configuration model, populating the list of updates to be
+     * executed by the controller.
+     */
+    void load(Collection<ModelNode> operations) throws ConfigurationPersistenceException;
+
+    /**
      * Load the configuration model, returning it as a list of updates to be
      * executed by the controller.
      */
+    @Deprecated
     List<ModelNode> load() throws ConfigurationPersistenceException;
 
     /**

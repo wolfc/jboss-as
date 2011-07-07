@@ -22,24 +22,6 @@
 
 package org.jboss.as.controller;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADDRESS;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_HEADERS;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROCESS_STATE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESPONSE_HEADERS;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ROLLBACK_ON_RUNTIME_FAILURE;
-
-import java.io.IOException;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.client.Operation;
 import org.jboss.as.controller.client.OperationAttachments;
@@ -56,6 +38,24 @@ import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.threads.AsyncFuture;
 import org.jboss.threads.AsyncFutureTask;
+
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADDRESS;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_HEADERS;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROCESS_STATE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESPONSE_HEADERS;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ROLLBACK_ON_RUNTIME_FAILURE;
 
 /**
  * @author <a href="mailto:david.lloyd@redhat.com">David M. Lloyd</a>
@@ -132,15 +132,73 @@ class ModelControllerImpl implements ModelController {
         return response;
     }
 
-    void boot(final List<ModelNode> bootList, final OperationMessageHandler handler, final OperationTransactionControl control) {
-        OperationContextImpl context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
-        ModelNode result = context.getResult();
-        result.setEmptyList();
-        for (ModelNode bootOp : bootList) {
-            final ModelNode response = result.add();
-            context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+    void boot(final BlockingQueue<ModelNode> bootList, final ModelNode done, final OperationMessageHandler handler, final OperationTransactionControl control) {
+        log.info("#bootOps = " + bootList.size());
+//        OperationContextImpl context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
+//        ModelNode result = context.getResult();
+//        result.setEmptyList();
+//        for (ModelNode bootOp : bootList) {
+//            OperationContextImpl context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
+//            //final ModelNode response = result.add();
+//            final ModelNode response = new ModelNode();
+//            context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+//            log.info(bootOp);
+//            context.completeStep();
+//        }
+        OperationContextImpl context = null;
+//        for (int i = 0; i < bootList.size(); i++) {
+//            if (context == null)
+//                context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
+//            final ModelNode bootOp = bootList.get(i);
+//            final ModelNode response = new ModelNode();
+//            context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+//            if ((i % 30) == 29) {
+//                context.completeStep();
+//                context = null;
+//            }
+//        }
+
+//        int i;
+//        context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
+//        for (i = 0; i < Integer.getInteger("test", 5); i++) {
+//            final ModelNode bootOp = take(bootList);
+//            final ModelNode response = new ModelNode();
+//            context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+//        }
+//        context.printSteps();
+//        context.completeStep();
+//        context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
+//        for (; i < bootList.size(); i++) {
+//            final ModelNode bootOp = take(bootList);
+//            final ModelNode response = new ModelNode();
+//            context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+//        }
+//        context.printSteps();
+//        if (context != null)
+//            context.completeStep();
+
+        ModelNode bootOp;
+        while ((bootOp = take(bootList)) != done) {
+            context = new OperationContextImpl(this, controllerType, EnumSet.noneOf(OperationContextImpl.ContextFlag.class), handler, null, model, control, processState, bootingFlag.get());
+            {
+                final ModelNode response = new ModelNode();
+                context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+            }
+            while ((bootOp = bootList.poll()) != null && bootOp != done) {
+                final ModelNode response = new ModelNode();
+                context.addStep(response, bootOp, new BootStepHandler(bootOp, response), OperationContext.Stage.MODEL);
+            }
+            //context.printSteps();
+            context.completeStep();
+            // we could have encountered it during polling
+            if (bootOp == done)
+                break;
         }
-        context.completeStep();
+//        context.printSteps();
+//        log.info("Completing steps at " + System.currentTimeMillis());
+//        context.completeStep();
+        log.info("Boot complete at " + System.currentTimeMillis());
+//        context.printSteps();
     }
 
     void finshBoot() {
@@ -289,14 +347,18 @@ class ModelControllerImpl implements ModelController {
     }
 
     void acquireContainerMonitor() {
-        stateMonitor.acquire();
+        if (stateMonitor != null)
+            stateMonitor.acquire();
     }
 
     void releaseContainerMonitor() {
+        if (stateMonitor != null)
         stateMonitor.release();
     }
 
     void awaitContainerMonitor(final boolean interruptibly, final int count) throws InterruptedException {
+        if (stateMonitor == null)
+            return;
         if (interruptibly) {
             stateMonitor.await(count);
         } else {
@@ -433,4 +495,11 @@ class ModelControllerImpl implements ModelController {
 
     }
 
+    private static <E> E take(final BlockingQueue<E> queue) {
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

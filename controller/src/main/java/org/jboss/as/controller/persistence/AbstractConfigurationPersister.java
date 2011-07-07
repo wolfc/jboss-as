@@ -22,18 +22,18 @@
 
 package org.jboss.as.controller.persistence;
 
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
-import org.jboss.as.controller.persistence.ConfigurationPersister.SnapshotInfo;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLMapper;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract superclass for {@link ExtensibleConfigurationPersister} implementations.
@@ -55,6 +55,14 @@ public abstract class AbstractConfigurationPersister implements ExtensibleConfig
      */
     public AbstractConfigurationPersister(final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
         this.rootDeparser = rootDeparser;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<ModelNode> load() throws ConfigurationPersistenceException {
+        final List<ModelNode> updates = new ArrayList<ModelNode>();
+        load(updates);
+        return updates;
     }
 
     @Override

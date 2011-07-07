@@ -22,16 +22,15 @@
 
 package org.jboss.as.controller.persistence;
 
-import java.util.List;
-import java.util.Set;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import javax.xml.namespace.QName;
-
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
+
+import javax.xml.namespace.QName;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An XML configuration persister which backs up the old file before overwriting it.
@@ -50,7 +49,7 @@ public class BackupXmlConfigurationPersister extends XmlConfigurationPersister {
      * @param rootParser the root model parser
      * @param rootDeparser the root model deparser
      */
-    public BackupXmlConfigurationPersister(final ConfigurationFile file, final QName rootElement, final XMLElementReader<List<ModelNode>> rootParser, final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
+    public BackupXmlConfigurationPersister(final ConfigurationFile file, final QName rootElement, final XMLElementReader<Collection<ModelNode>> rootParser, final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
         super(file.getBootFile(), rootElement, rootParser, rootDeparser);
         this.configurationFile = file;
     }

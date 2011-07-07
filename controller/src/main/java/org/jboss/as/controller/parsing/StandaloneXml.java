@@ -22,12 +22,7 @@
 
 package org.jboss.as.controller.parsing;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PERSISTENT;
 import org.jboss.as.controller.operations.common.Util;
-
-import static org.jboss.as.controller.parsing.ParseUtils.parsePossibleExpression;
-import static org.jboss.as.controller.parsing.ParseUtils.requireNoAttributes;
 import org.jboss.as.controller.persistence.ModelMarshallingContext;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.dmr.ModelNode;
@@ -42,6 +37,7 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -50,16 +46,17 @@ import java.util.Set;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CONTENT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.CORE_SERVICE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEFAULT_INTERFACE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEPLOYMENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ENABLED;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.EXTENSION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.INTERFACE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MANAGEMENT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.MANAGEMENT_INTERFACE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PATH;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PERSISTENT;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PORT_OFFSET;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RUNTIME_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SOCKET_BINDING_GROUP;
@@ -68,6 +65,8 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SYS
 import static org.jboss.as.controller.parsing.ParseUtils.isNoNamespaceAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.missingRequired;
 import static org.jboss.as.controller.parsing.ParseUtils.nextElement;
+import static org.jboss.as.controller.parsing.ParseUtils.parsePossibleExpression;
+import static org.jboss.as.controller.parsing.ParseUtils.requireNoAttributes;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
@@ -83,7 +82,7 @@ public class StandaloneXml extends CommonXml {
     }
 
     @Override
-    public void readElement(final XMLExtendedStreamReader reader, final List<ModelNode> operationList) throws XMLStreamException {
+    public void readElement(final XMLExtendedStreamReader reader, final Collection<ModelNode> operationList) throws XMLStreamException {
         final ModelNode address = new ModelNode().setEmptyList();
         if (Namespace.forUri(reader.getNamespaceURI()) != Namespace.DOMAIN_1_0 || Element.forName(reader.getLocalName()) != Element.SERVER) {
             throw unexpectedElement(reader);
@@ -91,7 +90,7 @@ public class StandaloneXml extends CommonXml {
         readServerElement(reader, address, operationList);
     }
 
-    private void readServerElement(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    private void readServerElement(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
 
         parseNamespaces(reader, address, list);
 
@@ -202,7 +201,7 @@ public class StandaloneXml extends CommonXml {
 //        }
     }
 
-    private void parseSocketBindingGroup(final XMLExtendedStreamReader reader, final Set<String> interfaces, final ModelNode address, final List<ModelNode> updates) throws XMLStreamException {
+    private void parseSocketBindingGroup(final XMLExtendedStreamReader reader, final Set<String> interfaces, final ModelNode address, final Collection<ModelNode> updates) throws XMLStreamException {
         final Set<String> socketBindings = new HashSet<String>();
 
         // Handle attributes
@@ -290,7 +289,7 @@ public class StandaloneXml extends CommonXml {
         }
     }
 
-    private void parseServerProfile(final XMLExtendedStreamReader reader, final ModelNode address, final List<ModelNode> list) throws XMLStreamException {
+    private void parseServerProfile(final XMLExtendedStreamReader reader, final ModelNode address, final Collection<ModelNode> list) throws XMLStreamException {
         // Attributes
         requireNoAttributes(reader);
 
@@ -327,7 +326,7 @@ public class StandaloneXml extends CommonXml {
         }
     }
 
-    private void setServerName(final ModelNode address, final List<ModelNode> operationList, final String value) {
+    private void setServerName(final ModelNode address, final Collection<ModelNode> operationList, final String value) {
         if (value.length() > 0) {
             final ModelNode update = Util.getWriteAttributeOperation(address, NAME, value);
             operationList.add(update);

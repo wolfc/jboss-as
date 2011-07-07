@@ -22,16 +22,6 @@
 
 package org.jboss.as.server;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectInputValidation;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.parsing.StandaloneXml;
 import org.jboss.as.controller.persistence.AbstractConfigurationPersister;
@@ -40,6 +30,17 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceActivator;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.threads.AsyncFuture;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.io.ObjectInputValidation;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * This is the task used by the Host Controller and passed to a Server instance
@@ -93,6 +94,11 @@ public final class ServerStartTask implements ServerTask, Serializable, ObjectIn
             @Override
             public PersistenceResource store(final ModelNode model, Set<PathAddress> affectedAddresses) throws ConfigurationPersistenceException {
                 return pr;
+            }
+
+            @Override
+            public void load(Collection<ModelNode> operations) throws ConfigurationPersistenceException {
+                operations.addAll(updates);
             }
 
             @Override

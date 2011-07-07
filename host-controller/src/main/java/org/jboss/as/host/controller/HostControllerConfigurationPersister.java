@@ -22,13 +22,6 @@
 
 package org.jboss.as.host.controller;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
-
-import java.io.File;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.Set;
-
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.persistence.ConfigurationFile;
 import org.jboss.as.controller.persistence.ConfigurationPersistenceException;
@@ -37,6 +30,14 @@ import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.as.domain.controller.LocalHostControllerInfo;
 import org.jboss.dmr.ModelNode;
 import org.jboss.staxmapper.XMLElementWriter;
+
+import java.io.File;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
 
 /**
  * Configuration persister that can delegate to a domain or host persister depending what needs to be persisted.
@@ -140,6 +141,11 @@ public class HostControllerConfigurationPersister implements ExtensibleConfigura
     @Override
     public void marshallAsXml(ModelNode model, OutputStream output) throws ConfigurationPersistenceException {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void load(Collection<ModelNode> operations) throws ConfigurationPersistenceException {
+        hostPersister.load(operations);
     }
 
     @Override

@@ -22,30 +22,6 @@
 
 package org.jboss.as.host.controller;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIBE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.FAILURE_DESCRIPTION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RUNNING_SERVER;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
-
-import java.io.IOException;
-import java.security.AccessController;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-
-import javax.security.auth.callback.CallbackHandler;
-
 import org.jboss.as.controller.AbstractControllerService;
 import org.jboss.as.controller.BootContext;
 import org.jboss.as.controller.ControlledProcessState;
@@ -98,6 +74,30 @@ import org.jboss.msc.value.InjectedValue;
 import org.jboss.remoting3.Channel;
 import org.jboss.remoting3.CloseHandler;
 import org.jboss.threads.JBossThreadFactory;
+
+import javax.security.auth.callback.CallbackHandler;
+import java.io.IOException;
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
+
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIBE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.FAILURE_DESCRIPTION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HOST;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OUTCOME;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.PROFILE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RESULT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.RUNNING_SERVER;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUCCESS;
 
 /**
  * Creates the service that acts as the {@link org.jboss.as.controller.ModelController} for a host.
@@ -265,7 +265,8 @@ public class DomainModelControllerService extends AbstractControllerService impl
     protected void boot(final BootContext context) throws ConfigurationPersistenceException {
         final ServiceTarget serviceTarget = context.getServiceTarget();
         try {
-            super.boot(configurationPersister.load()); // This parses the host.xml and invokes all ops
+            // TODO: async
+            super.boot(new LinkedBlockingDeque<ModelNode>(configurationPersister.load()), null); // This parses the host.xml and invokes all ops
 
             //Install the server inventory
             NetworkInterfaceBinding nativeManagementInterfaceBinding = getNativeManagementNetworkInterfaceBinding();
@@ -293,7 +294,8 @@ public class DomainModelControllerService extends AbstractControllerService impl
             } else {
                 // parse the domain.xml and load the steps
                 ConfigurationPersister domainPersister = configurationPersister.getDomainPersister();
-                super.boot(domainPersister.load());
+                // TODO: async
+                super.boot(new LinkedBlockingDeque<ModelNode>(domainPersister.load()), null);
                 RemotingServices.installChannelServices(serviceTarget, new MasterDomainControllerOperationHandlerService(this, this),
                         DomainModelControllerService.SERVICE_NAME, RemotingServices.DOMAIN_CHANNEL, null, null);
                 serverInventory = getFuture(inventoryFuture);

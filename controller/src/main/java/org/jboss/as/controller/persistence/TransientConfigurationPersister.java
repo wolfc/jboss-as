@@ -27,7 +27,7 @@ import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
 
 import javax.xml.namespace.QName;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -44,7 +44,7 @@ public class TransientConfigurationPersister extends XmlConfigurationPersister {
      * @param rootParser   the root model parser
      * @param rootDeparser the root model deparser
      */
-    public TransientConfigurationPersister(final ConfigurationFile file, final QName rootElement, final XMLElementReader<List<ModelNode>> rootParser, final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
+    public TransientConfigurationPersister(final ConfigurationFile file, final QName rootElement, final XMLElementReader<Collection<ModelNode>> rootParser, final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
         super(file.getBootFile(), rootElement, rootParser, rootDeparser);
     }
 

@@ -22,26 +22,24 @@
 
 package org.jboss.as.controller.persistence;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
 import org.jboss.as.controller.PathAddress;
 import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLMapper;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * A configuration persister which uses an XML file for backing storage.
@@ -54,7 +52,7 @@ public class XmlConfigurationPersister extends AbstractConfigurationPersister {
 
     private final File fileName;
     private final QName rootElement;
-    private final XMLElementReader<List<ModelNode>> rootParser;
+    private final XMLElementReader<Collection<ModelNode>> rootParser;
 
     /**
      * Construct a new instance.
@@ -64,7 +62,7 @@ public class XmlConfigurationPersister extends AbstractConfigurationPersister {
      * @param rootParser the root model parser
      * @param rootDeparser the root model deparser
      */
-    public XmlConfigurationPersister(final File fileName, final QName rootElement, final XMLElementReader<List<ModelNode>> rootParser, final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
+    public XmlConfigurationPersister(final File fileName, final QName rootElement, final XMLElementReader<Collection<ModelNode>> rootParser, final XMLElementWriter<ModelMarshallingContext> rootDeparser) {
         super(rootDeparser);
         this.fileName = fileName;
         this.rootElement = rootElement;
@@ -95,10 +93,9 @@ public class XmlConfigurationPersister extends AbstractConfigurationPersister {
 
     /** {@inheritDoc} */
     @Override
-    public List<ModelNode> load() throws ConfigurationPersistenceException {
+    public void load(final Collection<ModelNode> updates) throws ConfigurationPersistenceException {
         final XMLMapper mapper = XMLMapper.Factory.create();
         mapper.registerRootElement(rootElement, rootParser);
-        final List<ModelNode> updates = new ArrayList<ModelNode>();
         try {
             final FileInputStream fis = new FileInputStream(fileName);
             try {
@@ -112,9 +109,10 @@ public class XmlConfigurationPersister extends AbstractConfigurationPersister {
                 safeClose(fis);
             }
         } catch (Exception e) {
+            // TODO: remove stack trace printing
+            e.printStackTrace();
             throw new ConfigurationPersistenceException("Failed to parse configuration", e);
         }
-        return updates;
     }
 
     private static void safeClose(final Closeable closeable) {
