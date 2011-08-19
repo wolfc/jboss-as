@@ -33,6 +33,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.CONNECTOR;
 import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.CORE_THREADS;
 import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_MDB_INSTANCE_POOL;
 import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_RESOURCE_ADAPTER_NAME;
@@ -58,6 +59,30 @@ public class EJB3SubsystemDescriptions {
     static final String RESOURCE_NAME = EJB3SubsystemProviders.class.getPackage().getName() + ".LocalDescriptions";
 
     public static final String BRIDGE = "bridge";
+
+    static final ModelNode getRemoteConnectorAddDescription(final Locale locale) {
+        final ResourceBundle bundle = getResourceBundle(locale);
+        final ModelNode description = new ModelNode();
+        description.get(DESCRIPTION).set(bundle.getString("ejb3.remoteconnector.add"));
+
+        description.get(REQUEST_PROPERTIES, CONNECTOR, TYPE).set(ModelType.STRING);
+        description.get(REQUEST_PROPERTIES, CONNECTOR, DESCRIPTION).set(bundle.getString("ejb3.remoteconnector.connector"));
+        description.get(REQUEST_PROPERTIES, CONNECTOR, REQUIRED).set(true);
+
+        return description;
+    }
+
+    static final ModelNode getRemoteConnectorDescription(final Locale locale) {
+        final ResourceBundle bundle = getResourceBundle(locale);
+        final ModelNode description = new ModelNode();
+        description.get(DESCRIPTION).set(bundle.getString("ejb3.remoteconnector"));
+
+        description.get(ATTRIBUTES, CONNECTOR, TYPE).set(ModelType.STRING);
+        description.get(ATTRIBUTES, CONNECTOR, DESCRIPTION).set(bundle.getString("ejb3.remoteconnector.connector"));
+        description.get(ATTRIBUTES, CONNECTOR, REQUIRED).set(true);
+
+        return description;
+    }
 
     static final ModelNode getSubystemDescription(final Locale locale) {
         final ResourceBundle bundle = getResourceBundle(locale);

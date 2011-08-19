@@ -43,6 +43,7 @@ public enum EJB3SubsystemXMLElement {
 
     POOLS("pools"),
 
+    REMOTE("remote"),
     RESOURCE_ADAPTER_NAME("resource-adapter-name"),
     RESOURCE_ADAPTER_REF("resource-adapter-ref"),
 

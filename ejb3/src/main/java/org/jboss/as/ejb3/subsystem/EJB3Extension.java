@@ -44,10 +44,10 @@ import java.util.Locale;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIBE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.*;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.*;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
+import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_MDB_INSTANCE_POOL;
+import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_RESOURCE_ADAPTER_NAME;
+import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_SLSB_INSTANCE_POOL;
 
 /**
  * @author Emanuel Muckenhuber
@@ -81,6 +81,10 @@ public class EJB3Extension implements Extension {
         subsystemRegistration.registerReadWriteAttribute(DEFAULT_MDB_INSTANCE_POOL, null, SetDefaultMDBPool.INSTANCE, AttributeAccess.Storage.CONFIGURATION);
         // default resource adapter name
         subsystemRegistration.registerReadWriteAttribute(DEFAULT_RESOURCE_ADAPTER_NAME, null, SetDefaultResourceAdapterName.INSTANCE, AttributeAccess.Storage.CONFIGURATION);
+
+        // remote
+        final ManagementResourceRegistration remoteConnectorService = subsystemRegistration.registerSubModel(EJB3SubsystemModel.REMOTE_CONNECTOR_SERVICE_PATH, EJB3SubsystemProviders.REMOTE_CONNECTOR_SERVICE);
+        remoteConnectorService.registerOperationHandler(ADD, RemoteConnectorAdd.INSTANCE, RemoteConnectorAdd.INSTANCE, false);
 
         // subsystem=ejb3/strict-max-bean-instance-pool=*
         final ManagementResourceRegistration strictMaxPoolRegistration = subsystemRegistration.registerSubModel(

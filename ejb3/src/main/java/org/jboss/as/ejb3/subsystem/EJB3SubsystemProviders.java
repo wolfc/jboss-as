@@ -23,28 +23,9 @@
 package org.jboss.as.ejb3.subsystem;
 
 import org.jboss.as.controller.descriptions.DescriptionProvider;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.ModelType;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEFAULT;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.HEAD_COMMENT_ALLOWED;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.NAMESPACE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUEST_PROPERTIES;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUIRED;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TAIL_COMMENT_ALLOWED;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
-import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.CORE_THREADS;
-import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.LITE;
-import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.MAX_THREADS;
-import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.PATH;
-import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.RELATIVE_TO;
 
 /**
  * {@link DescriptionProvider} implementations for EJB3 subsystem resources.
@@ -52,6 +33,13 @@ import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.RELATIVE_TO;
  * @author Emanuel Muckenhuber
  */
 class EJB3SubsystemProviders {
+
+    static final DescriptionProvider REMOTE_CONNECTOR_SERVICE = new DescriptionProvider() {
+        @Override
+        public ModelNode getModelDescription(Locale locale) {
+            return EJB3SubsystemDescriptions.getRemoteConnectorDescription(locale);
+        }
+    };
 
     static final DescriptionProvider SUBSYSTEM = new DescriptionProvider() {
 
