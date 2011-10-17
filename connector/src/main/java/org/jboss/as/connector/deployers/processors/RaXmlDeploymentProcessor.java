@@ -82,14 +82,10 @@ public class RaXmlDeploymentProcessor implements DeploymentUnitProcessor {
             return; // Skip non ra deployments
         }
 
-        ResourceAdapters raxmls = null;
         // getResourceAdaptersAttachment(deploymentUnit);
         final ServiceController<?> raService = phaseContext.getServiceRegistry().getService(
                 ConnectorServices.RESOURCEADAPTERS_SERVICE);
-        if (raService != null)
-            raxmls = ((ResourceAdapters) raService.getValue());
-        if (raxmls == null)
-            return;
+        final ResourceAdapters raxmls = (ResourceAdapters) raService.getValue();
 
         ROOT_LOGGER.tracef("processing Raxml");
         Module module = deploymentUnit.getAttachment(Attachments.MODULE);

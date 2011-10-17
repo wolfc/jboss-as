@@ -22,11 +22,18 @@
 
 package org.jboss.as.connector.subsystems.resourceadapters;
 
-import static org.jboss.as.connector.subsystems.resourceadapters.Constants.RESOURCEADAPTER_NAME;
-
-import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.connector.ConnectorServices;
+import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.dmr.ModelNode;
+import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceTarget;
+
+import java.util.List;
+
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.RESOURCEADAPTER_NAME;
 
 /**
  * Handler for adding the datasource subsystem.
@@ -35,16 +42,20 @@ import org.jboss.dmr.ModelNode;
  *         Maestri</a>
  * @author John Bailey
  */
-class ResourceAdaptersSubSystemAdd extends AbstractAddStepHandler {
+class ResourceAdaptersSubSystemAdd extends AbstractBoottimeAddStepHandler {
 
     static final ResourceAdaptersSubSystemAdd INSTANCE = new ResourceAdaptersSubSystemAdd();
+
+    @Override
+    protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
+        final ResourceAdaptersService.ModifiableResourceAdaptors resourceAdapters = new ResourceAdaptersService.ModifiableResourceAdaptors(null);
+        final ServiceTarget serviceTarget = context.getServiceTarget();
+        newControllers.add(serviceTarget.addService(ConnectorServices.RESOURCEADAPTERS_SERVICE,
+                new ResourceAdaptersService(resourceAdapters)).setInitialMode(ServiceController.Mode.ACTIVE).addListener(verificationHandler).install());
+    }
 
     protected void populateModel(ModelNode operation, ModelNode model) {
         model.setEmptyObject();
         model.get(RESOURCEADAPTER_NAME);
-    }
-
-    protected boolean requiresRuntime(OperationContext context) {
-        return false;
     }
 }

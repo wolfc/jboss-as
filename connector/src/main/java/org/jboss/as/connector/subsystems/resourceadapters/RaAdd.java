@@ -22,20 +22,19 @@
 
 package org.jboss.as.connector.subsystems.resourceadapters;
 
-import org.jboss.as.controller.OperationContext;
-import org.jboss.as.controller.OperationStepHandler;
-import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.ServiceVerificationHandler;
-
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ARCHIVE;
 import org.jboss.as.connector.ConnectorServices;
 import org.jboss.as.connector.subsystems.resourceadapters.ResourceAdaptersService.ModifiableResourceAdaptors;
+import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.OperationStepHandler;
 import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceTarget;
+
+import static org.jboss.as.connector.subsystems.resourceadapters.Constants.ARCHIVE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 
 /**
  * Operation handler responsible for adding a Ra.
@@ -72,21 +71,9 @@ public class RaAdd extends AbstractRaOperation implements OperationStepHandler {
 
                     final ServiceController<?> raService = context.getServiceRegistry(false).getService(
                             ConnectorServices.RESOURCEADAPTERS_SERVICE);
-                    ServiceController<?> controller = null;
-                    if (raService == null) {
-                         controller = serviceTarget.addService(ConnectorServices.RESOURCEADAPTERS_SERVICE,
-                                        new ResourceAdaptersService(resourceAdapters)).setInitialMode(Mode.ACTIVE).addListener(verificationHandler).install();
-                    } else {
-                        ((ModifiableResourceAdaptors) raService.getValue()).addAllResourceAdapters(resourceAdapters.getResourceAdapters());
-                    }
+                    ((ModifiableResourceAdaptors) raService.getValue()).addAllResourceAdapters(resourceAdapters.getResourceAdapters());
 
                     context.addStep(verificationHandler, OperationContext.Stage.VERIFY);
-
-                    if (context.completeStep() == OperationContext.ResultAction.ROLLBACK) {
-                        if(controller != null) {
-                            context.removeService(ConnectorServices.RESOURCEADAPTERS_SERVICE);
-                        }
-                    }
                 }
             }, OperationContext.Stage.RUNTIME);
         }
