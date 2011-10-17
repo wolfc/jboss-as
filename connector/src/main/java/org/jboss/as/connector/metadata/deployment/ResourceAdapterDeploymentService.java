@@ -48,7 +48,6 @@ import org.jboss.msc.service.StopContext;
 import java.io.File;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -190,6 +189,8 @@ public final class ResourceAdapterDeploymentService extends AbstractResourceAdap
                         return true;
                 }
 
+                // TODO: this is all very silly code, I don't see why we can't activate always
+                // TODO: needs sensible warning messages instead of leaving the user in the dark
                 if (ijmd != null) {
                     if (ijmd.getConnectionDefinitions() != null) {
                         for (org.jboss.jca.common.api.metadata.common.CommonConnDef def : ijmd.getConnectionDefinitions()) {
@@ -198,6 +199,7 @@ public final class ResourceAdapterDeploymentService extends AbstractResourceAdap
                             if (raMcfClasses.contains(clz))
                                 return true;
                         }
+                        DEPLOYERS_LOGGER.warn("Did not find matching connection-definitions for " + raMcfClasses);
                     }
 
                     if (ijmd.getAdminObjects() != null) {
@@ -207,8 +209,11 @@ public final class ResourceAdapterDeploymentService extends AbstractResourceAdap
                             if (raAoClasses.contains(clz))
                                 return true;
                         }
+                        DEPLOYERS_LOGGER.warn("Did not find matching admin-objects for " + raAoClasses);
                     }
                 }
+                else
+                    DEPLOYERS_LOGGER.warn("Can't activate " + cmd + ", there is no ironjacamar.xml");
             }
 
             return false;
