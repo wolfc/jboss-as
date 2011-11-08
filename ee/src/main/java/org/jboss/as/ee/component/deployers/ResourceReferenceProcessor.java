@@ -39,6 +39,8 @@ import org.jboss.metadata.javaee.spec.ResourceEnvironmentReferencesMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferencesMetaData;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,7 +144,7 @@ public class ResourceReferenceProcessor extends AbstractDeploymentDescriptorBind
             if (!isEmpty(resourceRef.getLookupName())) {
                 bindingConfiguration = new BindingConfiguration(name, new LookupInjectionSource(resourceRef.getLookupName()));
             } else if (!isEmpty(resourceRef.getResUrl())) {
-                bindingConfiguration = new BindingConfiguration(name, new EnvEntryInjectionSource(resourceRef.getResUrl()));
+                bindingConfiguration = new BindingConfiguration(name, new EnvEntryInjectionSource(url(resourceRef.getResUrl())));
             } else {
                 if (classType == null) {
                     throw new DeploymentUnitProcessingException("Could not determine type for resource-ref " + name);
@@ -290,5 +292,13 @@ public class ResourceReferenceProcessor extends AbstractDeploymentDescriptorBind
         // Now that we know its not a primitive, lets just allow
         // the passed classloader to handle the request.
         return Class.forName(className, false, cl);
+    }
+
+    private static URL url(final String spec) throws DeploymentUnitProcessingException {
+        try {
+            return new URL(spec);
+        } catch (MalformedURLException e) {
+            throw new DeploymentUnitProcessingException(e);
+        }
     }
 }
