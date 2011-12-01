@@ -39,7 +39,6 @@ import org.jboss.as.controller.operations.validation.StringLengthValidator;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.Property;
-import org.jboss.security.vault.SecurityVaultException;
 
 /**
  * Handler for the Vault
@@ -58,12 +57,12 @@ public class VaultAddHandler extends AbstractAddStepHandler implements Descripti
 
     private final ParametersValidator validator = new ParametersValidator();
 
-    private final RuntimeVaultReader vaultReader;
+    private final AbstractVaultReader vaultReader;
 
     /**
      * Create the PathAddHandler
      */
-    public VaultAddHandler(RuntimeVaultReader vaultReader) {
+    public VaultAddHandler(AbstractVaultReader vaultReader) {
         this.vaultReader = vaultReader;
      // code is an optional string
         validator.registerValidator(CODE, new ModelTypeValidator(ModelType.STRING, true));
@@ -92,7 +91,7 @@ public class VaultAddHandler extends AbstractAddStepHandler implements Descripti
         if (vaultReader != null) {
             try {
                 vaultReader.createVault(vaultClass, vaultOptions);
-            } catch (SecurityVaultException e) {
+            } catch (VaultReaderException e) {
                 throw new OperationFailedException(e, new ModelNode().set("Error initializing vault"));
             }
         }
