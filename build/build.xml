@@ -26,7 +26,7 @@
 
     <property name="output.dir" value="target/jboss-as-${jboss.as.release.version}"/>
 
-    <target name="base" depends="clean-target, modules-minimalistic, copy-files, make-dirs, copy-client"/>
+    <target name="base" depends="clean-target, modules-minimalistic, copy-files, make-dirs"/>
 
     <target name="copy-files">
         <copy todir="${output.dir}">
@@ -53,12 +53,14 @@
         <chmod perm="600" file="${output.dir}/standalone/configuration/mgmt-users.properties"/>
 
         <!-- Copy the JBoss AS7 EJB specific schemas to the JBOSS_HOME/docs/schema folder -->
+        <!--
         <unzip src="${org.jboss.as:jboss-as-ejb3:jar}" dest="${output.dir}/docs/schema/">
             <patternset>
                 <include name="*.xsd"/>
             </patternset>
             <mapper type="flatten"/>
         </unzip>
+        -->
 
     </target>
 
@@ -122,7 +124,23 @@
           ~ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
           -->
 
+        <module-def name="javax.annotation.api">
+            <maven-resource group="org.jboss.spec.javax.annotation" artifact="jboss-annotations-api_1.1_spec"/>
+        </module-def>
+
         <module-def name="javax.api"/>
+
+        <module-def name="javax.interceptor.api">
+            <maven-resource group="org.jboss.spec.javax.interceptor" artifact="jboss-interceptors-api_1.1_spec"/>
+        </module-def>
+
+        <module-def name="javax.transaction.api">
+            <maven-resource group="org.jboss.spec.javax.transaction" artifact="jboss-transaction-api_1.1_spec"/>
+        </module-def>
+
+        <module-def name="javax.validation.api">
+            <maven-resource group="javax.validation" artifact="validation-api"/>
+        </module-def>
 
         <module-def name="javax.xml.stream.api"/>
 
@@ -152,6 +170,14 @@
 
         <module-def name="org.jboss.as.domain-management">
             <maven-resource group="org.jboss.as" artifact="jboss-as-domain-management"/>
+        </module-def>
+
+        <module-def name="org.jboss.as.ee">
+            <maven-resource group="org.jboss.as" artifact="jboss-as-ee"/>
+        </module-def>
+
+        <module-def name="org.jboss.as.ee.deployment">
+            <maven-resource group="org.jboss.as" artifact="jboss-as-ee-deployment"/>
         </module-def>
 
         <module-def name="org.jboss.as.embedded">
@@ -237,6 +263,10 @@
 
         <module-def name="org.jboss.logmanager.log4j">
             <maven-resource group="org.jboss.logmanager" artifact="jboss-logmanager-log4j"/>
+        </module-def>
+
+        <module-def name="org.jboss.as.naming">
+            <maven-resource group="org.jboss.as" artifact="jboss-as-naming"/>
         </module-def>
 
         <module-def name="org.jboss.remoting3">
@@ -337,10 +367,6 @@
             <maven-resource group="javax.activation" artifact="activation"/>
         </module-def>
 
-        <module-def name="javax.annotation.api">
-            <maven-resource group="org.jboss.spec.javax.annotation" artifact="jboss-annotations-api_1.1_spec"/>
-        </module-def>
-
         <module-def name="javax.ejb.api">
             <maven-resource group="org.jboss.spec.javax.ejb" artifact="jboss-ejb-api_3.1_spec"/>
         </module-def>
@@ -367,10 +393,6 @@
 
         <module-def name="javax.inject.api">
             <maven-resource group="javax.inject" artifact="javax.inject"/>
-        </module-def>
-
-        <module-def name="javax.interceptor.api">
-            <maven-resource group="org.jboss.spec.javax.interceptor" artifact="jboss-interceptors-api_1.1_spec"/>
         </module-def>
 
         <module-def name="javax.jms.api">
@@ -419,14 +441,6 @@
 
         <module-def name="javax.servlet.jstl.api">
             <maven-resource group="org.jboss.spec.javax.servlet.jstl" artifact="jboss-jstl-api_1.2_spec"/>
-        </module-def>
-
-        <module-def name="javax.transaction.api">
-            <maven-resource group="org.jboss.spec.javax.transaction" artifact="jboss-transaction-api_1.1_spec"/>
-        </module-def>
-
-        <module-def name="javax.validation.api">
-            <maven-resource group="javax.validation" artifact="validation-api"/>
         </module-def>
 
         <module-def name="javax.ws.rs.api">
@@ -745,14 +759,6 @@
 
     	<module-def name="org.jboss.as.domain-add-user" />
 
-        <module-def name="org.jboss.as.ee">
-            <maven-resource group="org.jboss.as" artifact="jboss-as-ee"/>
-        </module-def>
-
-        <module-def name="org.jboss.as.ee.deployment">
-            <maven-resource group="org.jboss.as" artifact="jboss-as-ee-deployment"/>
-        </module-def>
-
         <module-def name="org.jboss.as.ejb3">
             <maven-resource group="org.jboss.as" artifact="jboss-as-ejb3"/>
         </module-def>
@@ -836,10 +842,6 @@
 
         <module-def name="org.jboss.as.pojo">
             <maven-resource group="org.jboss.as" artifact="jboss-as-pojo"/>
-        </module-def>
-
-        <module-def name="org.jboss.as.naming">
-            <maven-resource group="org.jboss.as" artifact="jboss-as-naming"/>
         </module-def>
 
      	<module-def name="org.jboss.as.osgi">
@@ -1241,5 +1243,5 @@
         <delete file="maven-ant-tasks.jar"/>
     </target>
 
-    <target name="all" depends="base, copy-standalone, modules, bundles, create-ext-content"/>
+    <target name="all" depends="base, copy-standalone, modules, bundles, create-ext-content, copy-client"/>
 </project>
