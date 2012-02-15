@@ -241,8 +241,10 @@ public class EJB3Subsystem12Parser implements XMLElementReader<List<ModelNode>>,
     }
 
     private void writeIIOP(final XMLExtendedStreamWriter writer, final ModelNode model) throws XMLStreamException {
+        /*
         writer.writeAttribute(EJB3SubsystemXMLAttribute.USE_QUALIFIED_NAME.getLocalName(), model.require(EJB3SubsystemModel.USE_QUALIFIED_NAME).asString());
         writer.writeAttribute(EJB3SubsystemXMLAttribute.ENABLE_BY_DEFAULT.getLocalName(), model.require(EJB3SubsystemModel.ENABLE_BY_DEFAULT).asString());
+        */
     }
 
     private void writeThreadPools(final XMLExtendedStreamWriter writer, final ModelNode threadPoolsModel) throws XMLStreamException {
@@ -604,6 +606,7 @@ public class EJB3Subsystem12Parser implements XMLElementReader<List<ModelNode>>,
     }
 
     private void parseIIOP(final XMLExtendedStreamReader reader, List<ModelNode> operations) throws XMLStreamException {
+        /*
         final int count = reader.getAttributeCount();
         boolean enableByDefault = true;
         boolean useQualifiedName = true;
@@ -629,6 +632,7 @@ public class EJB3Subsystem12Parser implements XMLElementReader<List<ModelNode>>,
         }
         requireNoContent(reader);
         operations.add(EJB3IIOPAdd.create(enableByDefault, useQualifiedName));
+        */
     }
 
     private ModelNode parseMDB(final XMLExtendedStreamReader reader, List<ModelNode> operations, final ModelNode ejb3SubsystemAddOperation) throws XMLStreamException {

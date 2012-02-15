@@ -395,6 +395,7 @@
                                             <exclude>org.apache.xalan:xalan</exclude>
                                             <exclude>org.hibernate:ejb3-persistence</exclude>
                                             <exclude>org.hibernate.java-persistence:jpa-api</exclude>
+                                            <exclude>org.jacorb:jacorb</exclude>
                                             <exclude>org.jboss.integration:jboss-jca-spi</exclude>
                                             <exclude>org.jboss.interceptor:jboss-interceptor-api</exclude>
                                             <exclude>org.jboss.javaee:jboss-javaee</exclude>
@@ -3655,7 +3656,7 @@
 
             <dependency>
                 <groupId>org.jboss.jbossts</groupId>
-                <artifactId>jbossjts</artifactId>
+                <artifactId>jbossjta</artifactId>
                 <version>${version.org.jboss.jbossts.jbossjts}</version>
                 <exclusions>
                     <exclusion>
@@ -3787,7 +3788,7 @@
 
             <dependency>
                 <groupId>org.jboss.jbossts</groupId>
-                <artifactId>jbossjts-integration</artifactId>
+                <artifactId>jbossjta-integration</artifactId>
                 <version>${version.org.jboss.jbossts.jbossjts-integration}</version>
                 <exclusions>
                     <exclusion>
@@ -5966,7 +5967,9 @@
                 <module>dist</module>
                 <module>ejb3</module>
                 <module>host-controller</module>
+                <!--
                 <module>jacorb</module>
+                -->
                 <module>jaxr</module>
                 <module>jaxrs</module>
                 <module>jdr</module>
@@ -5987,7 +5990,9 @@
                 <module>web</module>
                 <module>webservices</module>
                 <module>weld</module>
+                <!--
                 <module>xts</module>
+                -->
                 <module>testsuite/shared</module>
                 <module>testsuite</module>
             </modules>

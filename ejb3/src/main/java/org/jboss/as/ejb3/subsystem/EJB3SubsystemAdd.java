@@ -50,7 +50,6 @@ import org.jboss.as.ejb3.deployment.processors.EjbJndiBindingsDeploymentUnitProc
 import org.jboss.as.ejb3.deployment.processors.EjbManagementDeploymentUnitProcessor;
 import org.jboss.as.ejb3.deployment.processors.EjbRefProcessor;
 import org.jboss.as.ejb3.deployment.processors.EjbResourceInjectionAnnotationProcessor;
-import org.jboss.as.ejb3.deployment.processors.IIOPJndiBindingProcessor;
 import org.jboss.as.ejb3.deployment.processors.ImplicitLocalViewProcessor;
 import org.jboss.as.ejb3.deployment.processors.MessageDrivenComponentDescriptionFactory;
 import org.jboss.as.ejb3.deployment.processors.SessionBeanComponentDescriptionFactory;
@@ -87,14 +86,9 @@ import org.jboss.as.ejb3.deployment.processors.merging.StatefulTimeoutMergingPro
 import org.jboss.as.ejb3.deployment.processors.merging.TransactionAttributeMergingProcessor;
 import org.jboss.as.ejb3.deployment.processors.merging.TransactionManagementMergingProcessor;
 import org.jboss.as.ejb3.deployment.processors.security.JaccEjbDeploymentProcessor;
-import org.jboss.as.ejb3.iiop.POARegistry;
-import org.jboss.as.ejb3.iiop.RemoteObjectSubstitutionService;
-import org.jboss.as.ejb3.iiop.stub.DynamicStubFactoryFactory;
 import org.jboss.as.ejb3.remote.DefaultEjbClientContextService;
 import org.jboss.as.ejb3.remote.LocalEjbReceiver;
 import org.jboss.as.ejb3.remote.TCCLBasedEJBClientContextSelector;
-import org.jboss.as.jacorb.rmi.DelegatingStubFactoryFactory;
-import org.jboss.as.jacorb.service.CorbaPOAService;
 import org.jboss.as.naming.InitialContext;
 import org.jboss.as.security.service.SimpleSecurityManager;
 import org.jboss.as.security.service.SimpleSecurityManagerService;
@@ -103,7 +97,6 @@ import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.ServerEnvironment;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.as.txn.service.TxnServices;
-import org.jboss.com.sun.corba.se.impl.javax.rmi.RemoteObjectSubstitutionManager;
 import org.jboss.dmr.ModelNode;
 import org.jboss.ejb.client.EJBClientContext;
 import org.jboss.ejb.client.naming.ejb.EjbNamingContextSetup;
@@ -112,7 +105,6 @@ import org.jboss.jca.core.spi.rar.ResourceAdapterRepository;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceTarget;
-import org.omg.PortableServer.POA;
 
 import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_CLUSTERED_SFSB_CACHE;
 import static org.jboss.as.ejb3.subsystem.EJB3SubsystemModel.DEFAULT_MDB_INSTANCE_POOL;
@@ -148,7 +140,7 @@ class EJB3SubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     @Override
     protected void performBoottime(final OperationContext context, ModelNode operation, final ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
-
+        /*
         //setup IIOP related stuff
         //This goes here rather than in EJB3IIOPAdd as it affects the server when it is acting as an iiop client
         //setup our dynamic stub factory
@@ -161,6 +153,7 @@ class EJB3SubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .install());
 
         RemoteObjectSubstitutionManager.setRemoteObjectSubstitution(substitutionService);
+        */
 
 
         //setup ejb: namespace
@@ -188,7 +181,9 @@ class EJB3SubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(Phase.POST_MODULE, Phase.POST_MODULE_EJB_REF, new EjbRefProcessor());
                 processorTarget.addDeploymentProcessor(Phase.POST_MODULE, Phase.POST_MODULE_EJB_CLIENT_CONTEXT_SETUP, new EjbClientContextSetupProcessor());
                 processorTarget.addDeploymentProcessor(Phase.POST_MODULE, Phase.POST_MODULE_EJB_BUSINESS_VIEW_ANNOTATION, new BusinessViewAnnotationProcessor(appclient));
+                /*
                 processorTarget.addDeploymentProcessor(Phase.POST_MODULE, Phase.POST_MODULE_EJB_ORB_BIND, new IIOPJndiBindingProcessor());
+                */
                 processorTarget.addDeploymentProcessor(Phase.POST_MODULE, Phase.POST_MODULE_EJB_JNDI_BINDINGS, new EjbJndiBindingsDeploymentUnitProcessor(appclient));
 
                 processorTarget.addDeploymentProcessor(Phase.INSTALL, Phase.INSTALL_EJB_JACC_PROCESSING, new JaccEjbDeploymentProcessor());
@@ -287,6 +282,7 @@ class EJB3SubsystemAdd extends AbstractBoottimeAddStepHandler {
                     .install());
 
 
+            /*
             // create the POA Registry use by iiop
             final POARegistry poaRegistry = new POARegistry();
             newControllers.add(context.getServiceTarget().addService(POARegistry.SERVICE_NAME, poaRegistry)
@@ -294,6 +290,7 @@ class EJB3SubsystemAdd extends AbstractBoottimeAddStepHandler {
                     .setInitialMode(ServiceController.Mode.PASSIVE)
                     .addListener(verificationHandler)
                     .install());
+            */
         }
     }
 

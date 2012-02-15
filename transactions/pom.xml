@@ -46,17 +46,19 @@
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-server</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.jacorb</groupId>
             <artifactId>jacorb</artifactId>
         </dependency>
+        -->
         <dependency>
             <groupId>org.jboss</groupId>
             <artifactId>jboss-transaction-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.jbossts</groupId>
-            <artifactId>jbossjts</artifactId>
+            <artifactId>jbossjta</artifactId>
             <exclusions>
               <exclusion>
                  <groupId>org.jboss.ironjacamar</groupId>
@@ -66,7 +68,7 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.jbossts</groupId>
-            <artifactId>jbossjts-integration</artifactId>
+            <artifactId>jbossjta-integration</artifactId>
             <exclusions>
               <exclusion>
                  <groupId>org.jboss.ironjacamar</groupId>
@@ -108,6 +110,9 @@
                     <compilerArgument>
                         -AgeneratedTranslationFilesPath=${project.basedir}/target/generated-translation-files
                     </compilerArgument>
+                    <excludes>
+                        <exclude>org/jboss/iiop/**/*.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>
