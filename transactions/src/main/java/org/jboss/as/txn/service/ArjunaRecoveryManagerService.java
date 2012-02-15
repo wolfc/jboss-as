@@ -23,9 +23,14 @@
 package org.jboss.as.txn.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
+import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
+import com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule;
+import com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner;
+import com.arjuna.ats.internal.txoj.recovery.TORecoveryModule;
+import com.arjuna.ats.jbossatx.jta.RecoveryManagerService;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
@@ -35,19 +40,6 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.omg.CORBA.ORB;
-
-import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
-import com.arjuna.ats.arjuna.common.recoveryPropertyManager;
-import com.arjuna.ats.internal.arjuna.recovery.AtomicActionRecoveryModule;
-import com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner;
-import com.arjuna.ats.internal.jts.recovery.contact.ExpiredContactScanner;
-import com.arjuna.ats.internal.jts.recovery.transactions.ExpiredServerScanner;
-import com.arjuna.ats.internal.jts.recovery.transactions.ExpiredToplevelScanner;
-import com.arjuna.ats.internal.jts.recovery.transactions.ServerTransactionRecoveryModule;
-import com.arjuna.ats.internal.jts.recovery.transactions.TopLevelTransactionRecoveryModule;
-import com.arjuna.ats.internal.txoj.recovery.TORecoveryModule;
-import com.arjuna.ats.jbossatx.jta.RecoveryManagerService;
-import com.arjuna.orbportability.internal.utils.PostInitLoader;
 
 import static org.jboss.as.txn.TransactionMessages.MESSAGES;
 
@@ -111,6 +103,7 @@ public class ArjunaRecoveryManagerService implements Service<RecoveryManagerServ
 
             this.recoveryManagerService = recoveryManagerService;
         } else {
+            /*
             final ORB orb = orbInjector.getValue();
             new PostInitLoader(PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb"), orb);
 
@@ -133,6 +126,8 @@ public class ArjunaRecoveryManagerService implements Service<RecoveryManagerServ
             } catch (Exception e) {
                 throw MESSAGES.managerStartFailure(e, "Recovery");
             }
+            */
+            throw new RuntimeException("JTS not available");
         }
     }
 

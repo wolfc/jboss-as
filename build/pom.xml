@@ -263,10 +263,12 @@
                     <artifactId>getopt</artifactId>
                 </dependency>
 
+                <!--
                 <dependency>
                     <groupId>org.jacorb</groupId>
                     <artifactId>jacorb</artifactId>
                 </dependency>
+                -->
 
                 <dependency>
                     <groupId>javax.activation</groupId>
@@ -850,10 +852,12 @@
                     <artifactId>jboss-as-host-controller</artifactId>
                 </dependency>
 
+                <!--
                 <dependency>
                     <groupId>org.jboss.as</groupId>
                     <artifactId>jboss-as-jacorb</artifactId>
                 </dependency>
+                -->
 
                 <dependency>
                     <groupId>org.jboss.as</groupId>
@@ -960,10 +964,12 @@
                     <artifactId>jboss-as-webservices-server-integration</artifactId>
                 </dependency>
 
+                <!--
                 <dependency>
                     <groupId>org.jboss.as</groupId>
                     <artifactId>jboss-as-xts</artifactId>
                 </dependency>
+                -->
 
                 <dependency>
                     <groupId>org.jboss.classfilewriter</groupId>
@@ -1082,12 +1088,12 @@
 
                 <dependency>
                     <groupId>org.jboss.jbossts</groupId>
-                    <artifactId>jbossjts</artifactId>
+                    <artifactId>jbossjta</artifactId>
                 </dependency>
 
                 <dependency>
                     <groupId>org.jboss.jbossts</groupId>
-                    <artifactId>jbossjts-integration</artifactId>
+                    <artifactId>jbossjta-integration</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1095,6 +1101,7 @@
                     <artifactId>jbosstxbridge</artifactId>
                 </dependency>
 
+                <!--
                 <dependency>
                     <groupId>org.jboss.jbossts</groupId>
                     <artifactId>jbossxts</artifactId>
@@ -1104,6 +1111,7 @@
                     <groupId>org.jboss.jbossts</groupId>
                     <artifactId>jbossxts-api</artifactId>
                 </dependency>
+                -->
 
                 <dependency>
                     <groupId>org.jboss.metadata</groupId>

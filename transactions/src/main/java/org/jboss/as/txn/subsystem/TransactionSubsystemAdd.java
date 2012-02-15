@@ -28,7 +28,6 @@ import javax.transaction.TransactionSynchronizationRegistry;
 
 import com.arjuna.ats.internal.arjuna.utils.UuidProcessId;
 import com.arjuna.ats.jbossatx.jta.RecoveryManagerService;
-import com.arjuna.ats.jts.common.jtsPropertyManager;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -180,7 +179,9 @@ class TransactionSubsystemAdd extends AbstractBoottimeAddStepHandler {
         //always propagate the transaction context
         //TODO: need a better way to do this, but this value gets cached in a static
         //so we need to make sure we set it before anything tries to read it
+        /* if (jts) ?
         jtsPropertyManager.getJTSEnvironmentBean().setAlwaysPropagateContext(true);
+        */
 
         context.addStep(new AbstractDeploymentChainStep() {
             protected void execute(final DeploymentProcessorTarget processorTarget) {

@@ -24,7 +24,6 @@ package org.jboss.as.ejb3.deployment.processors;
 
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
-import org.jboss.as.jacorb.deployment.JacORBDeploymentMarker;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -85,10 +84,12 @@ public class EjbDependencyDeploymentUnitProcessor implements DeploymentUnitProce
         //we always have to add this, as even non-ejb deployments may still lookup IIOP ejb's
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, EJB_SUBSYSTEM, false, false, false, false));
 
+        /*
         if (JacORBDeploymentMarker.isJacORBDeployment(deploymentUnit)) {
             //needed for dynamic IIOP stubs
             moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, JACORB, false, false, false, false));
         }
+        */
 
         // fetch the EjbJarMetaData
         //TODO: remove the app client bit after the next EJB release

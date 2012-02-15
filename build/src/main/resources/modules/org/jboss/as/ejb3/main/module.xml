@@ -41,7 +41,7 @@
         <module name="javax.resource.api"/>
         <module name="javax.rmi.api"/>
         <module name="org.hibernate"/>
-        <module name="org.jacorb"/>
+        <module name="org.jacorb" optional="true"/>
         <module name="org.jboss.as.clustering.api"/>
         <module name="org.jboss.as.clustering.ejb3.infinispan" services="import" optional="true"/>
         <module name="org.jboss.as.clustering.infinispan"/>
@@ -51,7 +51,7 @@
         <!-- So we can access its integration API -->
         <module name="org.jboss.as.connector"/>
         <module name="org.jboss.as.ee"/>
-        <module name="org.jboss.as.jacorb"/>
+        <module name="org.jboss.as.jacorb" optional="true"/>
         <module name="org.jboss.as.naming"/>
         <module name="org.jboss.as.network"/>
         <module name="org.jboss.as.remoting"/>

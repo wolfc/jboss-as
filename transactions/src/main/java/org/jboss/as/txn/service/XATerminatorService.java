@@ -45,7 +45,10 @@ public final class XATerminatorService implements Service<JBossXATerminator> {
 
     public void start(final StartContext context) throws StartException {
         if (jts) {
+            /*
             value = new com.arjuna.ats.internal.jbossatx.jts.jca.XATerminator();
+            */
+            throw new RuntimeException("JTS not available");
         } else {
             value = new com.arjuna.ats.internal.jbossatx.jta.jca.XATerminator();
         }

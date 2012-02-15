@@ -26,7 +26,6 @@ import java.util.Map;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.ejb3.component.EJBComponent;
 import org.jboss.as.ejb3.deployment.EjbDeploymentInformation;
-import org.jboss.as.ejb3.iiop.EjbIIOPService;
 import org.jboss.msc.value.InjectedValue;
 
 /**
@@ -38,7 +37,7 @@ public class ManagementEjbDeploymentInformation extends EjbDeploymentInformation
 
     public ManagementEjbDeploymentInformation(String ejbName, Map<String, InjectedValue<ComponentView>> componentViews, ClassLoader deploymentClassLoader) {
         // FIXME ManagementEjbDeploymentInformation constructor
-        super(ejbName, new InjectedValue<EJBComponent>(), componentViews, deploymentClassLoader, new InjectedValue<EjbIIOPService>());
+        super(ejbName, new InjectedValue<EJBComponent>(), componentViews, deploymentClassLoader, new InjectedValue());
     }
 
     @Override

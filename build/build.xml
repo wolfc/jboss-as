@@ -648,9 +648,11 @@
             <maven-resource group="org.infinispan" artifact="infinispan-client-hotrod" />
         </module-def>
 
+        <!--
         <module-def name="org.jacorb">
             <maven-resource group="org.jacorb" artifact="jacorb"/>
         </module-def>
+        -->
 
         <module-def name="org.javassist">
             <maven-resource group="org.javassist" artifact="javassist"/>
@@ -760,9 +762,11 @@
             <maven-resource group="org.jboss.as" artifact="jboss-as-jsr77"/>
         </module-def>
 
+        <!--
         <module-def name="org.jboss.as.jacorb">
             <maven-resource group="org.jboss.as" artifact="jboss-as-jacorb"/>
         </module-def>
+        -->
 
         <module-def name="org.jboss.as.jaxr">
             <maven-resource group="org.jboss.as" artifact="jboss-as-jaxr"/>
@@ -936,11 +940,11 @@
         </module-def>
 
         <module-def name="org.jboss.jts">
-            <maven-resource group="org.jboss.jbossts" artifact="jbossjts"/>
+            <maven-resource group="org.jboss.jbossts" artifact="jbossjta"/>
         </module-def>
 
         <module-def name="org.jboss.jts.integration">
-            <maven-resource group="org.jboss.jbossts" artifact="jbossjts-integration"/>
+            <maven-resource group="org.jboss.jbossts" artifact="jbossjta-integration"/>
         </module-def>
 
         <module-def name="org.jboss.metadata">

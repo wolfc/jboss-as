@@ -22,13 +22,18 @@
 
 package org.jboss.as.txn.service;
 
-import static org.jboss.as.txn.TransactionMessages.MESSAGES;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.arjuna.ats.arjuna.common.CoordinatorEnvironmentBean;
+import com.arjuna.ats.arjuna.common.arjPropertyManager;
+import com.arjuna.ats.arjuna.tools.osb.mbean.ObjStoreBrowser;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter;
+import com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter;
+import com.arjuna.ats.jta.common.JTAEnvironmentBean;
+import com.arjuna.ats.jta.common.jtaPropertyManager;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -42,14 +47,7 @@ import org.jboss.tm.usertx.UserTransactionRegistry;
 import org.jboss.tm.usertx.client.ServerVMClientUserTransaction;
 import org.omg.CORBA.ORB;
 
-import com.arjuna.ats.arjuna.common.CoordinatorEnvironmentBean;
-import com.arjuna.ats.arjuna.common.arjPropertyManager;
-import com.arjuna.ats.arjuna.tools.osb.mbean.ObjStoreBrowser;
-import com.arjuna.ats.internal.jta.recovery.arjunacore.JTANodeNameXAResourceOrphanFilter;
-import com.arjuna.ats.internal.jta.recovery.arjunacore.JTATransactionLogXAResourceOrphanFilter;
-import com.arjuna.ats.jta.common.JTAEnvironmentBean;
-import com.arjuna.ats.jta.common.jtaPropertyManager;
-import com.arjuna.orbportability.internal.utils.PostInitLoader;
+import static org.jboss.as.txn.TransactionMessages.MESSAGES;
 
 /**
  * A service for the proprietary Arjuna {@link com.arjuna.ats.jbossatx.jta.TransactionManagerService}
@@ -126,6 +124,7 @@ public final class ArjunaTransactionManagerService implements Service<com.arjuna
             service.start();
             value = service;
         } else {
+            /*
             final ORB orb = orbInjector.getValue();
             new PostInitLoader(PostInitLoader.generateORBPropertyName("com.arjuna.orbportability.orb"), orb);
 
@@ -154,6 +153,8 @@ public final class ArjunaTransactionManagerService implements Service<com.arjuna
                 throw MESSAGES.startFailure(e);
             }
             value = service;
+            */
+            throw new RuntimeException("JTS not available");
         }
 
         try {

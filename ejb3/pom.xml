@@ -47,6 +47,13 @@ vi:ts=4:sw=4:expandtab
                     <compilerArgument>
                         -AgeneratedTranslationFilesPath=${project.build.directory}/generated-translation-files
                     </compilerArgument>
+                    <excludes>
+                        <exclude>**/*IIOP*.java</exclude>
+                        <exclude>**/*iiop*/*.java</exclude>
+                        <exclude>org/jboss/as/ejb3/deployment/processors/*IIOP*.java</exclude>
+                        <exclude>org/jboss/as/ejb3/iiop/**/*.java</exclude>
+                    </excludes>
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
             <plugin>
@@ -90,10 +97,12 @@ vi:ts=4:sw=4:expandtab
             <artifactId>jboss-as-ee</artifactId>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jboss-as-jacorb</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>${project.groupId}</groupId>
