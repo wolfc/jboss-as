@@ -128,12 +128,6 @@
             <artifactId>staxmapper</artifactId>
         </dependency>
 
-        <!-- Add this dependency to make sure that the core model is tested before we build the server -->
-        <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-core-model-test</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-domain-http-error-context</artifactId>
@@ -152,6 +146,11 @@
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jbossweb-native</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.common</groupId>
+            <artifactId>jboss-common-beans</artifactId>
         </dependency>
 
         <dependency>
@@ -197,6 +196,11 @@
         <dependency>
             <groupId>org.jboss.msc</groupId>
             <artifactId>jboss-msc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.remotingjmx</groupId>
+            <artifactId>remoting-jmx</artifactId>
         </dependency>
     </dependencies>
 
@@ -749,11 +753,6 @@
                 </dependency>
 
                 <dependency>
-                    <groupId>org.jboss.common</groupId>
-                    <artifactId>jboss-common-beans</artifactId>
-                </dependency>
-
-                <dependency>
                     <groupId>org.jboss</groupId>
                     <artifactId>jboss-common-core</artifactId>
                 </dependency>
@@ -879,6 +878,12 @@
                 <dependency>
                     <groupId>org.jboss.as</groupId>
                     <artifactId>jboss-as-controller-client</artifactId>
+                </dependency>
+
+                <!-- Add this dependency to make sure that the core model is tested before we build the server -->
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-core-model-test</artifactId>
                 </dependency>
 
                 <dependency>
@@ -1306,11 +1311,6 @@
                 <dependency>
                     <groupId>org.jboss.remoting3</groupId>
                     <artifactId>jboss-remoting</artifactId>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.jboss.remotingjmx</groupId>
-                    <artifactId>remoting-jmx</artifactId>
                 </dependency>
 
                 <dependency>

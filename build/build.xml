@@ -281,6 +281,10 @@
             <maven-resource group="org.jboss.stdio" artifact="jboss-stdio"/>
         </module-def>
 
+        <module-def name="org.jboss.remoting-jmx">
+            <maven-resource group="org.jboss.remotingjmx" artifact="remoting-jmx"/>
+        </module-def>
+
         <module-def name="org.jboss.threads">
             <maven-resource group="org.jboss.threads" artifact="jboss-threads"/>
         </module-def>
@@ -1043,10 +1047,6 @@
         <module-def name="org.jboss.remote-naming">
             <maven-resource group="org.jboss" artifact="jboss-remote-naming"/>
         </module-def>
-
-        <module-def name="org.jboss.remoting-jmx">
-            <maven-resource group="org.jboss.remotingjmx" artifact="remoting-jmx"/>
-        </module-def>    	
 
         <module-def name="org.jboss.resteasy.resteasy-atom-provider">
             <maven-resource group="org.jboss.resteasy" artifact="resteasy-atom-provider"  jandex="true"/>
